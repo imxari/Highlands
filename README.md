@@ -1,7 +1,7 @@
 # Highlands
-======
 
-#### **Highlands IS in ALPHA development stages **
+## Warning
+**Highlands is currently in ALPHA stages of development and may not be fully functional. When using this project at this current point in time expect issues. **
 
 ## Prerequisites
 ------
