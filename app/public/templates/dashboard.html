@@ -1,0 +1,11 @@
+<html>
+	<body>
+		{% include "base_loggedin.html" %}
+
+                {% if session['logged_in'] is undefined %}
+                        <script> document.location.href = "/login" </script>
+                {% endif %}
+
+		{% include "footer.html" %}
+	</body>
+</html>

@@ -1,0 +1,48 @@
+<html>
+	<body>
+		{% include "base_default.html" %}
+
+		{% if session['logged_in'] %}
+			<script> document.location.href = "/dashboard" </script>
+		{% endif %}
+
+		<!-- Spacing from top -->
+		<br><br><br>
+
+		<div class="container">
+			<div class="jumbotron">
+				<h1> Login: </h1>
+				<hr>
+				<form action="/logincheck" method="POST">
+					<!-- Username -->
+					<div class="form-group">
+						<label for="username"> Username </label>
+						<input type="text" class="form-control" name="username" aria-describedby="usernameHelp" placeholder="Enter Username">
+						<small id="usernameHelp" class="form-text text-muted">Please enter your Username. </small>
+					</div>
+		
+					<!-- Password -->
+					<div class="form-group">
+						<label for="password"> Password </label>
+						<input type="password" class="form-control" name="password" aria-describedby="passwordHelp" placeholder="Enter Password">
+						<small id="passwordHelp" class="form-text text-muted">Please enter your Password. </small>
+					</div>
+		
+					<!-- Submit -->
+					<button type="submit" class="btn btn-primary"> Submit </button>
+				</form>
+				{% with messages = get_flashed_messages() %}
+					{% if messages %}
+						<div class="alert alert-danger">
+							{% for message in messages %}
+								<strong> Error! </strong> {{ message }}
+							{% endfor %}
+						</div>
+					{% endif %}
+				{% endwith %}
+			</div>
+		</div>
+
+		{% include "footer.html" %}
+	</body>
+</html>

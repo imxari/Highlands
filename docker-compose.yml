@@ -1,0 +1,14 @@
+version: '3' # Don't touch this
+
+services: # Don't touch this
+    highlands_web:
+        restart: unless-stopped
+        build: # Don't touch this
+            dockerfile: Dockerfile # Don't touch this
+            context: ./ # Don't touch this
+        container_name: highlands_web # Specify the container name
+        volumes:
+            - ./app:/app # Don't touch this
+        ports:
+            - '80:5000' # Port '5000' is the Flask Applications webserver port
+

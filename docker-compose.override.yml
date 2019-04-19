@@ -1,0 +1,8 @@
+version: '3' # Don't touch this
+
+services: # Don't touch this
+    highlands_web:
+        container_name: highlands_web # Specify the container name
+        ports:
+            - '15600:5000' # Port '5000' is the Flask Applications webserver port
+
