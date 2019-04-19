@@ -29,4 +29,5 @@ The default web interface port for Highlands is '15600', you can reach it by goi
 
 ## Bug reporting
 ------
-If you're experiencing any issues with Highlands please open an issue under this repository detailing the issue.
+If you're experiencing any issues with Highlands please open an issue under this repository detailing the issue. Please ensure that you provide details about your environment such as operating system, kernal and docker versions etc. If your issue is missing details it will either be put on hold or be closed.
+
