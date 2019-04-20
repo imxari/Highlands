@@ -40,21 +40,29 @@ class User:
         conn = Database().connect()
 
         c = conn.cursor()
+	c.row_factory = sqlite3.Row
         c.execute("SELECT username,password FROM users WHERE username='{un}' AND password='{pw}'".format(un=POST_USERNAME, pw=POST_PASSWORD))
-
-        rows = c.fetchall()
-
+       
         usernameCorrect = False
-        passwordCorrect = False
-        for row in rows:
-            for value in row:
-                if POST_USERNAME == value:
-                    usernameCorrect = True
-                elif POST_PASSWORD == value:
-                    passwordCorrect = True
+	passwordCorrect = False
+
+	dbresult = c.fetchone()
+
+        if dbresult == None or len(dbresult) <= 0:
+	    print "[!] User: " + POST_USERNAME + " has failed authentication! Possible break-in attempt?"
+	    return False
+
+	if POST_USERNAME == dbresult["username"]:
+	    usernameCorrect = True
+	if POST_PASSWORD == dbresult["password"]:
+	    passwordCorrect = True
 
         if usernameCorrect == True and passwordCorrect == True:
+	    print "[!] User: " + POST_USERNAME + " has been authenticated successfully!"
             return True
+	else:
+	    print "[!] User: " + POST_USERNAME + " has failed authentication! Possible break-in attempt?"
+	    return False
  
 
 """ Default route """
