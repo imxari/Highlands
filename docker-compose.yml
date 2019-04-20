@@ -6,9 +6,9 @@ services: # Don't touch this
         build: # Don't touch this
             dockerfile: Dockerfile # Don't touch this
             context: ./ # Don't touch this
-        container_name: highlands_web # Specify the container name
+        container_name: $HTTP_NAME # Specify the container name
         volumes:
             - ./app:/app # Don't touch this
         ports:
-            - '$HTTP_PORT:5000' # Port '5000' is the Flask Applications webserver port
+            - $HTTP_PORT:5000 # Port '5000' is the Flask Applications webserver port
 
