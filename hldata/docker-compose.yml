@@ -2,8 +2,6 @@ version: '3' # Don't touch this
 
 services: # Don't touch this
     highlands_web:
-        env_file:
-            - ./.env
         restart: unless-stopped
         build: # Don't touch this
             dockerfile: Dockerfile # Don't touch this
