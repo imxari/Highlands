@@ -10,6 +10,11 @@ services: # Don't touch this
         tty: true # Don't touch this
         volumes:
             - ./app:/app # Don't touch this
+            - zt1:/var/lib/zerotier-one
         ports:
             - $HTTP_PORT:5000 # Port '5000' is the Flask Applications webserver port
+        cap_add:
+            - NET_ADMIN
 
+volumes:
+    zt1:

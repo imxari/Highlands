@@ -15,7 +15,7 @@ RUN apk update && apk upgrade && apk add \
 	bash python2 py2-pip py-mysqldb zerotier-one 
 
 # Setup Flask and other required pip packages
-RUN pip install Flask Jinja2 Babel Flask-Babel Flask-Login Flask-Mail Flask-OpenID Flask-WTF Tempita WTForms Werkzeug blinker decorator distribute flup python-openid pytz speaklater
+RUN pip install Flask Jinja2 Babel Flask-Babel Flask-Login Flask-Mail Flask-OpenID Flask-WTF Tempita WTForms Werkzeug blinker decorator distribute flup python-openid pytz speaklater requests
 
 # Remove APK cache
 RUN rm -rf /var/cache/apk/*

@@ -1,15 +1,32 @@
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import os
-import sqlite3
+import requests, os, sqlite3
 
 """ Init the Flask application  """
 app = Flask(__name__)
 app.secret_key = os.urandom(2)
 
-""" Dashboard Zerotier-One node information """
-def dashboard_info():
-    pass
+""" Get the Zerotier-One authkey """
+def get_authkey():
+    path = "/var/lib/zerotier-one/authtoken.secret"
+
+    f = open(path, 'r')
+    apikey = f.read()
+
+    f.close()
+    return apikey
+
+""" Get Zerotier-One status information """
+def zerotier_status():
+    authkey = get_authkey()
+
+    uri = "http://127.0.0.1:9993/status"
+    parameters = {'X-ZT1-Auth':authkey}
+
+    request = requests.get(url=uri, params=parameters)
+
+    return request.json()
+
 
 # =============================================================================
 
