@@ -2,10 +2,12 @@ version: '3' # Don't touch this
 
 services: # Don't touch this
     highlands_web:
+        env_file:
+            - ./.env
         restart: unless-stopped
         build: # Don't touch this
             dockerfile: Dockerfile # Don't touch this
-            context: ./ # Don't touch this
+            context: ./Dockerfiles/ # Don't touch this
         container_name: $HTTP_NAME # Specify the container name
         tty: true # Don't touch this
         volumes:

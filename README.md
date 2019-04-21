@@ -18,10 +18,10 @@ Before using Highlands ensure the system running Highlands meets the following r
 To install Highlands please follow the steps below:  
 1. Clone the repository:  
 ``` cd /tmp && git clone https://github.com/h0lysp4nk/Highlands.git && mv /tmp/Highlands /opt/highlands ```
-2. After cloning the repository enter the directory and build the Dockerfile:  
-``` cd /opt/highlands && docker-compose build ```
-3. Once the Dockerfile has finished building, start the container:  
-``` docker-compose up -d ```
+2. After cloning the repository enter the directory and run the bash script:   
+``` bash highlands.sh install ```
+3. Once the script has finished Highlands is successfully installed, you can view the usage of the above script by typing the following command:  
+``` bash highlands.sh ```
 
 ## Web Interface
 ------
