@@ -6,6 +6,41 @@
                         <script> document.location.href = "/login" </script>
                 {% endif %}
 
+		<br><br><br>
+
+		<script src="https://code.jquery.com/jquery-3.4.0.js">
+			$.ajax({
+			        url: "http://127.0.0.1:9993/status",
+			        type: 'GET',
+			        success: function(res) {
+			            console.log(res);
+			            alert(res);
+			        }
+			});
+		</script>
+
+		<div class="container">
+			<div class="jumbotron">
+				<h1> Highlands </h1>
+				<p> Information about this node: </p>
+				<hr>
+				<div>
+					<table class="table">
+						<thead class="thead-dark">
+							<tr>
+								<th scope="col"> Property </th>
+								<th scope="col"> Value </th>
+							</tr>
+						</thead>
+						<tbody>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
+
 		{% include "footer.html" %}
 	</body>
 </html>

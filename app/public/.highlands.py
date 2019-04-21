@@ -2,72 +2,60 @@
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
 import os
 import sqlite3
+import hashlib
 
 """ Init the Flask application  """
 app = Flask(__name__)
 app.secret_key = os.urandom(2)
 
-""" Dashboard Zerotier-One node information """
-def dashboard_info():
-    pass
-
-# =============================================================================
-
 """ Class for handling database connections, checks etc... """
 class Database:
-
-    """ Handles connect us to the database """
     dbpath = "/app/highlands.db"
     def connect(self):
         return sqlite3.connect(self.dbpath)
 
-    """ Handles the initial setup of the sqlite3 database """
     def setup(self):
-	user_table_sql = 'CREATE TABLE `users`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` VARCHAR(75) NOT NULL, `password` VARCHAR(75) NOT NULL, `email` VARCHAR(75) NOT NULL)'
-        #default_user_sql = 'INSERT INTO users(username, password, email) VALUES("admin", "password", "admin@invalid.com")'
+	user_table_sql = 'CREATE TABLE `users`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` VARCHAR(75) NOT NULL, `password` VARCHAR(75) NOT NULL, `firstname` VARCHAR(75) NOT NULL, `lastname` VARCHAR(75) NOT NULL, `email` VARCHAR(75) NOT NULL)'
+        default_user_sql = 'INSERT INTO users(username, password, firstname, lastname, email) VALUES("admin", "password", "Admin", "User", "admin@invalid.com")'
 
 	conn = self.connect()
 	c = conn.cursor()
 
 	c.execute(user_table_sql)
-	#c.execute(default_user_sql)
 
-        User().create("admin", "password", "example@invalid.com")
+        User().create("admin", "password", "Admin", "User", "example@invalid.com", "admin")
 
 	conn.commit()
 	conn.close()
 
-    """ Handles initialization of the database """
     def __init__(self):
         if os.path.exists(self.dbpath) == False:
 	    print "[?] Error, database wasn't found..."
 	    self.setup()
 	    print "[!] Done, database was created"
-
 """ Class for handling database interactions related to Users """
 class User:
-    """ Handles creating a new user account """
-    def create(self, username, password, email):
-        if username == None or password == None or email == None:
+    def __init__(self):
+        pass
+
+    def create(self, username=None, password=None, firstname=None, lastname=None, email=None, role=None):
+        if username == None or password == None or firstname == None or lastname == None or email == None or role == None:
 	    return False
 	else:
-	    query = 'INSERT INTO users(username, password, email) VALUES("{user}", "{passw}", "{mail}")'.format(user=username, passw=password, mail=email)
+	    query = 'INSERT INTO users(username, password, firstname, lastname, email, role) VALUES("{usr}", "{passw}", "{fname}", "{lname}", "{mail}", "{urole}")'.format(usr=username, passw=password, fname=firstname, lname=lastname, mail=email, urole=role)
 	    conn = Database().connect()
-	    c = conn.cursor()
 
+	    c = conn.cursor()
+	    c.row_factory = sqlite3.Row
 	    try:
 	        c.execute(query)
-		conn.commit()
-	    except sqlite3.Error as e:
-	        print str(e)
+                c.commit()
 		conn.close()
-		return False
-	    finally:
+		return True
+	    except:
 	        conn.close()
-	        return True
+	        return False
 
-
-    """ Handles checking the provided data for signing in a user """
     def login(self, POST_USERNAME, POST_PASSWORD):
         conn = Database().connect()
 
@@ -97,8 +85,6 @@ class User:
 	    return False
  
 
-# =============================================================================
-
 """ Default route """
 @app.route('/login')
 def login():
@@ -109,7 +95,6 @@ def logout():
     session.clear()
     return login()
 
-""" Dashboard """
 @app.route('/')
 @app.route('/dashboard')
 def dashboard():
@@ -132,10 +117,7 @@ def logincheck():
         flash('Either your username or password was wrong. Try again.')
         return login()
 
-# =============================================================================
-
 """ Start the Flask application """
 if __name__ == "__main__":
     Database()
     app.run(debug=True, host='0.0.0.0', port=5000)
-
