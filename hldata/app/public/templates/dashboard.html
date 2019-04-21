@@ -11,7 +11,7 @@
 		<div class="container">
 			<div class="jumbotron">
 				<h1> Highlands </h1>
-				<p> Information about this node: </p>
+				<p> ZeroTier-One information: </p>
 				<hr>
 				<div>
 					<table class="table">
@@ -22,7 +22,34 @@
 							</tr>
 						</thead>
 						<tbody>
-
+							<tr>
+								<td> Member Address </td>
+								<td> {{ status["address"] }} </td>
+							</tr>
+							<tr>
+								<td> Online </td>
+								<td> {{ status["online"] }} </td>
+							</tr>
+							<tr>
+								<td> Version </td>
+								<td> {{ status["version"] }} </td>
+							</tr>
+							<tr>
+								<td> Version Build </td>
+								<td> {{ status["versionBuild"] }} </td>
+							</tr>
+							<tr>
+								<td> Version Major </td>
+								<td> {{ status["versionMajor"] }} </td>
+							</tr>
+							<tr>
+								<td> Versiom Minor </td>
+								<td> {{ status["versionMinor"] }} </td>
+							</tr>
+							<tr>
+								<td> Version Revision </td>
+								<td> {{ status["versionRev"] }} </td>
+							</tr>
 						</tbody>
 					</table>
 				</div>

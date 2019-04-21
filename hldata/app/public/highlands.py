@@ -1,6 +1,6 @@
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import requests, os, sqlite3
+import os, sqlite3, json, random
 
 """ Init the Flask application  """
 app = Flask(__name__)
@@ -17,15 +17,19 @@ def get_authkey():
     return apikey
 
 """ Get Zerotier-One status information """
-def zerotier_status():
+def zerotier_request(uri):
     authkey = get_authkey()
 
-    uri = "http://127.0.0.1:9993/status"
-    parameters = {'X-ZT1-Auth':authkey}
+    command_id = random.randint(1000,9999)
+    command = 'curl --header "X-ZT1-Auth: ' + authkey + '" ' + uri + ' > /app/tmp/' + str(command_id) + ".tmp"
 
-    request = requests.get(url=uri, params=parameters)
+    os.system(command)
 
-    return request.json()
+    path = "/app/tmp/" + str(command_id) + ".tmp"
+    f = open(path, 'r')
+    
+    return f
+
 
 
 # =============================================================================
@@ -130,7 +134,10 @@ def logout():
 @app.route('/')
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    status_json = zerotier_request('http://127.0.0.1:9993/status')
+    status_dict = json.load(status_json)
+    print str(status_dict)
+    return render_template('dashboard.html', status=status_dict)
 
 """ Login check """
 @app.route('/logincheck', methods=['POST'])
