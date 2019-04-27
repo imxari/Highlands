@@ -12,7 +12,7 @@ Before using Highlands ensure the system running Highlands meets the following r
 4. CPython version: 2.7.13 or higher  
 5. OpenSSL version: 1.0.1t or higher  
 5. Git version 1.8.3.1 or higher
-
+  
 ## Install
 ------
 To install Highlands please follow the steps below:  
@@ -30,4 +30,8 @@ The default web interface port for Highlands is '15600', you can reach it by goi
 ## Bug reporting
 ------
 If you're experiencing any issues with Highlands please open an issue under this repository detailing the issue. Please ensure that you provide details about your environment such as operating system, kernal and docker versions etc. If your issue is missing details it will either be put on hold or be closed.
+
+## Credits
+------
+**zailbon** Created the Zerotier API used in this project: https://github.com/zero-os/zerotier_client
 

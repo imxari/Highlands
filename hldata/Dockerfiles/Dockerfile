@@ -12,7 +12,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
 
 # Add basics first
 RUN apk update && apk upgrade && apk add \
-	bash python2 py2-pip py-mysqldb zerotier-one curl
+	bash python2 py2-pip py-mysqldb zerotier-one curl git
 
 # Setup Flask and other required pip packages
 RUN pip install Flask Jinja2 Babel Flask-Babel Flask-Login Flask-Mail Flask-OpenID Flask-WTF Tempita WTForms Werkzeug blinker decorator distribute flup python-openid pytz speaklater

@@ -1,6 +1,6 @@
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import os, sqlite3, json, random
+import os, sqlite3, json, random, time
 
 """ Init the Flask application  """
 app = Flask(__name__)
@@ -157,6 +157,12 @@ def logincheck():
         return login()
 
 # =============================================================================
+
+""" Remove old temp files on regular basis """
+def rm_temp():
+    while True:
+        os.system("rm -rf /app/tmp/*.tmp")
+	time.sleep(300)
 
 """ Start the Flask application """
 if __name__ == "__main__":
