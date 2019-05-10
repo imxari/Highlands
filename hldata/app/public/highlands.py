@@ -52,7 +52,8 @@ class Init:
         dbnames = client.list_database_names()
         if 'highlands' not in dbnames:
             doc = {'username': 'admin',
-                   'password': 'password'}
+                   'password': 'password',
+                   'role': 'admin'}
             db = client.highlands
             db.users.insert_one(doc)
 
@@ -105,7 +106,7 @@ class Network:
             return False
         else:
             try:
-                if re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/]", name) == True:
+                if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/]", name) == True:
                     return False
                 elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?\,]", cidr) == True:
                     return False
@@ -136,6 +137,79 @@ class Network:
 
 """ Class for handling MongoDB related user queries"""
 class User:
+    def change_password(self, username=None, currentpassword=None, newpassword=None):
+        if username == None:
+            return False
+        elif currentpassword == None:
+            return False
+        elif newpassword == None:
+            return None
+        else:
+            docsearch = {"username": username,
+                         "password": currentpassword}
+            docreplace = {"username": username,
+                          "password": newpassword}
+
+            client = Database().init()
+            database = client.highlands
+
+            database.users.update_one(docsearch, docreplace)
+
+            doc = database.users.find_one(docreplace)
+            doc_dict = dumps(doc)
+
+            if username in doc_dict and newpassword in doc_dict:
+                return True
+            else:
+                return False
+
+
+    def delete(self, username=None):
+        if username == None:
+            return False
+        elif username == "admin":
+            return False
+        else:
+            doc = {"username": username}
+
+            client = Database().init()
+            database = client.highlands
+
+            database.users.delete_one(doc)
+
+            doccheck = database.users.query(doc)
+            doccheck_dict = dumps(doccheck)
+
+            if username in doccheck_dict == True:
+                return False
+            else:
+                return True
+
+    def create(self, username=None, password=None, role=None):
+        if username == None:
+            return False
+        elif password == None:
+            return False
+        elif role == None:
+            return False
+        else:
+            checkQuery = {"username": username}
+            client = Database().init()
+            database = client.highlands
+            
+            doc = database.users.find(query)
+            doc_dict = dumps(doc)
+
+            if username in doc_dict == True:
+                return False
+            else:
+                newdoc = {"username": username,
+                          "password": password,
+                          "role": role}
+                database.users.insert_one(newdoc)
+                return True
+
+
     def login(self, username=None, password=None):
         if username == None:
             return False
