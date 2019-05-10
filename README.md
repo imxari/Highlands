@@ -33,5 +33,5 @@ If you're experiencing any issues with Highlands please open an issue under this
 
 ## Credits
 ------
-**zailbon** Created the Zerotier API used in this project: https://github.com/zero-os/zerotier_client
+**zailbon** - Created the Zerotier API used in this project: https://github.com/zero-os/zerotier_client
 

@@ -7,12 +7,12 @@
 #
 # =============================================================================
 
-# Show Highlands banner
-cat .banner.txt && echo
-
 # Change directory into hldata
 script_dir=`dirname $0`
 cd $script_dir/hldata
+
+# Show highlands banner
+cat /opt/highlands/hldata/banner.txt && echo
 
 # Handle cli input
 case $1 in
@@ -68,6 +68,7 @@ case $1 in
 		fi;;
 	"install")
 		# Install Highlands
+                docker network create highlands
 		docker-compose up -d --build
 		if [ $? -eq 0 ]; then
 			# Success
@@ -79,6 +80,6 @@ case $1 in
 			exit 1
 		fi;;
 	*)
-		echo "[!] Usage: ./highlands.sh <start|stop|restart>";;
+		echo "[!] Usage: ./highlands.sh <start|stop|restart|status|install>";;
 esac
 
