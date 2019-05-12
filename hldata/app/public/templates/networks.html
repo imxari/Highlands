@@ -25,6 +25,11 @@
 							</tr>
 						</thead>
 						<tbody>
+							{% if networks|length <= 0 %}
+								<tr>
+									<td> No networks found... </td>
+								</tr>
+							{% endif %}
 							{% for network in networks %}
 								<tr>
 									<td> {{ network['name'] }} </td>
@@ -32,10 +37,10 @@
 									<td>
 										<div class="btn-toolbar" role="toolbar" aria-label="Network Management Toolbar">
 											<div class="btn-group mr-2" role="group" aria-label="group">
-												<button type="button" class="btn btn-success" href="#"> Detail </button>
-												<button type="button" class="btn btn-info" href="#"> Members </button>
-												<button type="button" class="btn btn-warning" href="#"> Modify </button>
-												<button type="button" class="btn btn-danger" href="/network-delete?nwid={{ network['id'] }}"> Delete </button>
+												<a type="button" class="btn btn-success" href="/network-detail?nwid={{ network['id'] }}"> Detail </a>
+												<a type="button" class="btn btn-info" href="/network-members?nwid={{ network['id'] }}"> Members </a>
+												<a type="button" class="btn btn-warning"> Modify </a>
+												<a type="button" class="btn btn-danger" href="/network-delete?nwid={{ network['id'] }}"> Delete </a>
 											</div>
 										</div>
 									</td>
@@ -46,13 +51,21 @@
                                 	{% with messages = get_flashed_messages() %}
                                         	{% if messages %}
 							{% for message in messages %}
-								{% if message == "OK" %}
+								{% if message == "OK-CREATED" %}
 									<div class="alert alert-success" role="alert">
 										<strong> Success! </strong> Network was created!
 									</div>
-								{% elif message == "ERROR" %}
+								{% elif message == "ERROR-CREATED" %}
 									<div class="alert alert-danger" role="alert">
 										<strong> Error! </strong> Network couldn't be created, maybe it already exists?
+									</div>
+								{% elif message == "OK-DELETED" %}
+									<div class="alert alert-success" role="alert">
+										<strong> Success! </strong> Network was deleted!
+									</div>
+								{% elif message == "OK-DELETED" %}
+									<div class="alert alert-danger" role="alert">
+										<strong> Error! </strong> Network couldn't be deleted, network doesn't exist?
 									</div>
 								{% endif %}
 							{% endfor %}

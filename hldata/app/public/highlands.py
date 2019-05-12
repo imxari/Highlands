@@ -19,6 +19,17 @@ def get_authkey():
     f.close()
     return apikey
 
+""" Handle DELETE Zerotier-One API requests """
+def zerotier_delete(uri=None, data=None, params=None):
+
+    authkey = get_authkey()
+
+    client = ztclient.Client('http://127.0.0.1:9993')
+
+    headers = {"X-ZT1-Auth": authkey}
+    resp = client.delete(uri, data, headers, params, 'json')
+    return resp.text
+
 """ Handle POST Zerotier-One API requests """
 def zerotier_post(uri=None, data=None, params=None):
 
@@ -94,6 +105,19 @@ class Database:
 
 """ Class for handling Zerotier-One network interactions """
 class Network:
+    """ Handles the removal of a network """
+    def delete(self, nwid=None):
+        if nwid == None:
+            return False
+        else:
+            try:
+                zerotier_delete(uri='http://127.0.0.1:9993/controller/network/' + nwid)
+            except Exception as e:
+                print str(e)
+                return False
+            finally:
+                return True
+
     """ Handles creation of a network """
     def create(self, name=None, cidr=None, dhcp_start=None, dhcp_end=None):
         if name == None:
@@ -266,6 +290,18 @@ def dashboard():
     status_dict = json.loads(status_json)
     return render_template('dashboard.html', status=status_dict)
 
+""" Network-Delete """
+@app.route('/network-delete', methods=['GET'])
+def networkdelete():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    result = Network().delete(nwid=GET_NETWORK_NWID)
+    if result == True:
+        flash("OK-DELETED")
+        return networks()
+    else:
+        flash("ERROR-DELETED")
+        return networks()
+
 """ Network-Create check """
 @app.route('/createnetworkcheck', methods=['POST'])
 def networkcreatecheck():
@@ -277,10 +313,10 @@ def networkcreatecheck():
     result = Network().create(name=POST_NETWORK_NAME, cidr=POST_NETWORK_CIDR, dhcp_start=POST_NETWORK_DHCP_START, dhcp_end=POST_NETWORK_DHCP_END)
 
     if result == True:
-        flash("OK")
+        flash("OK-CREATED")
         return networks()
     else:
-        flash("ERROR")
+        flash("ERROR-CREATED")
         return networks()
 
 """ Login check """
