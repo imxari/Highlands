@@ -229,10 +229,6 @@ class User:
 
 # =============================================================================
 
-@app.route('/create-network')
-def create_network():
-    return render_template('create-network.html')
-
 @app.route('/networks')
 def networks():
     networks_json = zerotier_get(uri='http://127.0.0.1:9993/controller/network')
@@ -269,10 +265,10 @@ def networkcreatecheck():
     result = Network().create(name=POST_NETWORK_NAME, cidr=POST_NETWORK_CIDR, dhcp_start=POST_NETWORK_DHCP_START, dhcp_end=POST_NETWORK_DHCP_END)
 
     if result == True:
-        flash("Network created!")
+        flash("OK")
         return networks()
     else:
-        flash("Network couldn't be created!")
+        flash("ERROR")
         return networks()
 
 """ Login check """

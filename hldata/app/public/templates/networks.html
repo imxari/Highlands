@@ -26,6 +26,22 @@
 						<tbody>
 						</tbody>
 					</table>
+                                	{% with messages = get_flashed_messages() %}
+                                        	{% if messages %}
+							{% for message in messages %}
+								{% if messages == "OK" %}
+									<div class="alert alert-success" role="alert">
+										<strong> Success! </strong> Network was created!
+									</div>
+								{% elif messages == "ERROR" %}
+									<div class="alert alert-danger" role="alert">
+										<strong> Error! </strong> Network couldn't be created, maybe it already exists?
+									</div>
+								{% endif %}
+							{% endfor %}
+                                        	{% endif %}
+                                	{% endwith %}
+
 				</div>
 			</div>
 
