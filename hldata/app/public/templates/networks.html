@@ -20,20 +20,37 @@
 						<thead class="thead-dark">
 							<tr>
 								<th scope="col"> Name </th>
+								<th scope="col"> ID </th>
 								<th scope="col"> Actions </th>
 							</tr>
 						</thead>
 						<tbody>
+							{% for network in networks %}
+								<tr>
+									<td> {{ network['name'] }} </td>
+									<td> {{ network['id'] }} </td>
+									<td>
+										<div class="btn-toolbar" role="toolbar" aria-label="Network Management Toolbar">
+											<div class="btn-group mr-2" role="group" aria-label="group">
+												<button type="button" class="btn btn-success" href="#"> Detail </button>
+												<button type="button" class="btn btn-info" href="#"> Members </button>
+												<button type="button" class="btn btn-warning" href="#"> Modify </button>
+												<button type="button" class="btn btn-danger" href="/network-delete?nwid={{ network['id'] }}"> Delete </button>
+											</div>
+										</div>
+									</td>
+								</tr>
+							{% endfor %}
 						</tbody>
 					</table>
                                 	{% with messages = get_flashed_messages() %}
                                         	{% if messages %}
 							{% for message in messages %}
-								{% if messages == "OK" %}
+								{% if message == "OK" %}
 									<div class="alert alert-success" role="alert">
 										<strong> Success! </strong> Network was created!
 									</div>
-								{% elif messages == "ERROR" %}
+								{% elif message == "ERROR" %}
 									<div class="alert alert-danger" role="alert">
 										<strong> Error! </strong> Network couldn't be created, maybe it already exists?
 									</div>

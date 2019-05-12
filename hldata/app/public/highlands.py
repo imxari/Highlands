@@ -232,9 +232,21 @@ class User:
 @app.route('/networks')
 def networks():
     networks_json = zerotier_get(uri='http://127.0.0.1:9993/controller/network')
-    print str(networks_json)
+    
     networks_dict = json.loads(networks_json)
-    return render_template('networks.html', networks=networks_dict)
+
+    dicts = list()
+    for nwid in networks_dict:
+        network_info = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + nwid)
+        if network_info == "{}":
+            continue
+        elif network_info == None:
+            continue
+        else:
+            dicts.append(json.loads(network_info))
+
+    print str(dicts)
+    return render_template('networks.html', networks=dicts)
 
 """ Default route """
 @app.route('/login')
