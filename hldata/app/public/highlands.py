@@ -106,13 +106,13 @@ class Network:
             return False
         else:
             try:
-                if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/]", name) == True:
+                if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", name) == True:
                     return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?\,]", cidr) == True:
+                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?\, ]", cidr) == True:
                     return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/]", dhcp_start) == True:
+                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_start) == True:
                     return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/]", dhcp_end) == True:
+                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_end) == True:
                     return False
 
                 status = zerotier_get('http://127.0.0.1:9993/status')

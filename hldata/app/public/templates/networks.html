@@ -14,6 +14,8 @@
 				<p> Networks on this controller: </p>
 				<hr>
 				<div>
+					<!-- Button trigger modal -->
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createNetworkCenter" style="margin-bottom: 25px;"> Create Network </button>
 					<table class="table">
 						<thead class="thead-dark">
 							<tr>
@@ -30,5 +32,56 @@
 		</div>
 
 		{% include "footer.html" %}
+
+		<!-- Create network modal -->
+		<div class="modal fade" id="createNetworkCenter" tabindex="-1" role="dialog" aria-labelledby="createNetworkTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="createNetworkTitle">Create Network</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						</div>
+						<div class="modal-body">
+							<form action="/createnetworkcheck" method="POST">
+								<!-- Network Name -->
+								<div class="form-group">
+									<label for="network-name"> Network Name </label>
+									<input type="text" class="form-control" name="network-name" aria-describedby="network-name-help" placeholder="Enter Network Name">
+									<small id="network-name-help" class="form-text text-muted">Please enter desired network name. </small>
+								</div>
+
+								<!-- Network CIDR -->
+								<div class="form-group">
+									<label for="network-cidr"> Network CIDR </label>
+									<input type="text" class="form-control" name="network-cidr" aria-describedby="network-cidr-help" placeholder="Enter Network CIDR">
+									<small id="network-cidr-help" class="form-text text-muted">Please enter desired CIDR. Example: 192.168.1.0/24 </small>
+								</div>
+
+								<!-- DHCP Start -->
+								<div class="form-group">
+									<label for="dhcp-start"> DHCP Start </label>
+									<input type="text" class="form-control" name="dhcp-start" aria-describedby="dhcp-start-help" placeholder="Enter DHCP Start">
+									<small id="dhcp-start-help" class="form-text text-muted">Please enter desired DHCP Start address. Example: 192.168.1.5 </small>
+								</div>
+
+								<!-- DHCP End -->
+								<div class="form-group">
+									<label for="dhcp-end"> DHCP Start </label>
+									<input type="text" class="form-control" name="dhcp-end" aria-describedby="dhcp-end-help" placeholder="Enter DHCP End">
+									<small id="dhcp-end-help" class="form-text text-muted">Please enter desired DHCP Start address. Example: 192.168.1.200 </small>
+								</div>
+
+
+
+								<!-- Submit -->
+								<button type="submit" class="btn btn-primary"> Submit </button>
+							</form>
+
+						</div>
+			</div>
+		</div>
+
 	</body>
 </html>
