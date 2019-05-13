@@ -115,12 +115,11 @@ class Network:
         else:
             try:
                 zerotier_delete(uri='http://127.0.0.1:9993/controller/network/' + nwid)
+                return True
             except Exception as e:
                 print str(e)
                 return False
-            finally:
-                return True
-
+            return False
     """ Handles creation of a network """
     def create(self, name=None, cidr=None, dhcp_start=None, dhcp_end=None):
         if name == None:
