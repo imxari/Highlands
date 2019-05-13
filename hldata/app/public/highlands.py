@@ -3,14 +3,21 @@
 
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import os, json, random, string, re, ConfigParser, sys
+import os, json, random, string, re, sys
 from bson.json_util import loads, dumps
 from zerotier import client as ztclient
-from pymongo import MongoClient
+from flask_htpasswd import HtPasswdAuth
 
 """ Init the Flask application  """
+secret = os.urandom(2)
+
 app = Flask(__name__)
-app.secret_key = os.urandom(2)
+app.secret_key = secret
+app.config['FLASK_SECRET'] = secret
+app.config['FLASK_HTPASSWD_PATH'] = '/app/.htpasswd'
+app.config['FLASK_AUTH_ALL'] = True
+
+htpasswd = HtPasswdAuth(app)
 
 """ Get the Zerotier-One authkey """
 def get_authkey():
@@ -58,54 +65,6 @@ def zerotier_get(uri=None, data=None, params=None):
 
 # =============================================================================
 
-""" Class for creating and ensuring that the MongoDB is configured """
-class Init:
-    def __init__(self):
-        client = Database().init()
-
-        dbnames = client.list_database_names()
-        if 'highlands' not in dbnames:
-            doc = {'username': 'admin',
-                   'password': 'password',
-                   'role': 'admin'}
-            db = client.highlands
-            db.users.insert_one(doc)
-
-
-
-""" Class for handling MongoDB interactions """
-class Database:
-    def connect(self, host=None, port=None, username=None, password=None):
-        if host == None:
-            return None
-        elif port == None:
-            return None
-        elif username == None:
-            return None
-        elif password == None:
-            return None
-        else:
-            uri = 'mongodb://' + username + ':' + password + '@' + host + ':' + port + '/'
-            try:
-                client = MongoClient(uri)
-                return client
-            except Exception as e:
-                print str(e)
-                return None
-
-
-    def init(self):
-        Config = ConfigParser.ConfigParser()
-        Config.read("/app/public/config.ini")
-
-        username=Config.get('mongodb','user')
-        password=Config.get('mongodb','pass')
-        host=Config.get('mongodb','host')
-        port=Config.get('mongodb','port')
-
-        client = self.connect(host, port, username, password)
-        return client
-
 """ Class for handling Zerotier-One network interactions """
 class Network:
     """ Handles the removal of a network """
@@ -124,9 +83,11 @@ class Network:
     def create(self, name=None):
         if name == None:
             return False
+        elif len(name) >= 33:
+            return False
         else:
             try:
-                if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", name) != None:
+                if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,.\/ ]", name) != None:
                     return False
                 else:
                     status = zerotier_get('http://127.0.0.1:9993/status')
@@ -146,98 +107,6 @@ class Network:
                 print str(e)
                 return False
             return False
-
-""" Class for handling MongoDB related user queries"""
-class User:
-    def change_password(self, username=None, currentpassword=None, newpassword=None):
-        if username == None:
-            return False
-        elif currentpassword == None:
-            return False
-        elif newpassword == None:
-            return None
-        else:
-            docsearch = {"username": username,
-                         "password": currentpassword}
-            docreplace = {"username": username,
-                          "password": newpassword}
-
-            client = Database().init()
-            database = client.highlands
-
-            database.users.update_one(docsearch, docreplace)
-
-            doc = database.users.find_one(docreplace)
-            doc_dict = dumps(doc)
-
-            if username in doc_dict and newpassword in doc_dict:
-                return True
-            else:
-                return False
-
-
-    def delete(self, username=None):
-        if username == None:
-            return False
-        elif username == "admin":
-            return False
-        else:
-            doc = {"username": username}
-
-            client = Database().init()
-            database = client.highlands
-
-            database.users.delete_one(doc)
-
-            doccheck = database.users.query(doc)
-            doccheck_dict = dumps(doccheck)
-
-            if username in doccheck_dict == True:
-                return False
-            else:
-                return True
-
-    def create(self, username=None, password=None, role=None):
-        if username == None:
-            return False
-        elif password == None:
-            return False
-        elif role == None:
-            return False
-        else:
-            checkQuery = {"username": username}
-            client = Database().init()
-            database = client.highlands
-            
-            doc = database.users.find(query)
-            doc_dict = dumps(doc)
-
-            if username in doc_dict == True:
-                return False
-            else:
-                newdoc = {"username": username,
-                          "password": password,
-                          "role": role}
-                database.users.insert_one(newdoc)
-                return True
-
-
-    def login(self, username=None, password=None):
-        if username == None:
-            return False
-        elif password == None:
-            return False
-        else:
-            client = Database().init()
-            database = client.highlands
-            query = {'username': username, 'password': password}
-
-            doc = database.users.find(query)
-            doc_dict = dumps(doc)
-            if username in doc_dict and password in doc_dict:
-                return True
-            else:
-                return False
 
 # =============================================================================
 
@@ -260,16 +129,6 @@ def networks():
     print str(dicts)
     return render_template('networks.html', networks=dicts)
 
-""" Default route """
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return login()
-
 """ Dashboard """
 @app.route('/')
 @app.route('/dashboard')
@@ -280,10 +139,8 @@ def dashboard():
 
 """ Network-Delete """
 @app.route('/network-delete', methods=['GET'])
+@htpasswd.required
 def networkdelete():
-    if session.get('logged_in') != True:
-        return login()
-
     GET_NETWORK_NWID = str(request.args.get('nwid'))
     result = Network().delete(nwid=GET_NETWORK_NWID)
     if result == True:
@@ -296,10 +153,6 @@ def networkdelete():
 """ Network-Create check """
 @app.route('/createnetworkcheck', methods=['POST'])
 def networkcreatecheck():
-    if session.get('logged_in') != True:
-        return login()
-
-
     POST_NETWORK_NAME = str(request.form['network-name'])
 
     result = Network().create(name=POST_NETWORK_NAME)
@@ -311,27 +164,9 @@ def networkcreatecheck():
         flash("ERROR-CREATED")
         return networks()
 
-""" Login check """
-@app.route('/logincheck', methods=['POST'])
-def logincheck():
-
-    POST_USERNAME = str(request.form['username'])
-    POST_PASSWORD = str(request.form['password'])
-
-    result = User().login(POST_USERNAME, POST_PASSWORD)
-
-    if result:
-        session['logged_in'] = True
-        session['username'] = request.form['username']
-        return dashboard()
-    else:
-        flash('Either your username or password was wrong. Try again.')
-        return login()
-
 # =============================================================================
 
 """ Start the Flask application """
 if __name__ == "__main__":
-    Init()
     app.run(debug=True, host='0.0.0.0', port=5000)
 
