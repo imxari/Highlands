@@ -20,7 +20,7 @@ To install Highlands please follow the steps below:
 1. Clone the repository:  
 ``` cd /tmp && git clone https://github.com/h0lysp4nk/Highlands.git && mv /tmp/Highlands /opt/highlands ```
 2. After cloning the repository we need to generate a .htpasswd file by running the following command:  
-``` htpasswd -c /opt/hldata/app/.htpasswd <your_username>
+``` htpasswd -c /opt/hldata/app/.htpasswd <your_username> ```
 3. Now we've setup the authentication enter the directory of the repository and run the bash script:   
 ``` bash highlands.sh install ```
 4. Once the script has finished Highlands is successfully installed, you can view the usage of the above script by typing the following command:  
