@@ -1,6 +1,9 @@
+#!/usr/bin/env python2
+# coding: utf8
+
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import os, json, random, string, re, ConfigParser
+import os, json, random, string, re, ConfigParser, sys
 from bson.json_util import loads, dumps
 from zerotier import client as ztclient
 from pymongo import MongoClient
@@ -130,34 +133,34 @@ class Network:
             return False
         else:
             try:
-                if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", name) == True:
+                if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", name) != None:
                     return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?\, ]", cidr) == True:
+                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?\, ]", cidr) != None:
                     return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_start) == True:
+                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_start) != None:
                     return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_end) == True:
+                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_end) != None:
                     return False
+                else:
+                    status = zerotier_get('http://127.0.0.1:9993/status')
+                    status_dict = json.loads(status)
 
-                status = zerotier_get('http://127.0.0.1:9993/status')
-                status_dict = json.loads(status)
+                    memberid = status_dict["address"]
 
-                memberid = status_dict["address"]
+                    data = {"name": name,
+                            "private": True,
+                            "v4AssignMode": {"zt": True },
+                            "ipAssignmentPools": { "ipRangeStart": str(dhcp_start), "ipRangeEnd": str(dhcp_end) },
+                            "routes": [ str(cidr) ]}
+                    jsonarray = json.dumps(data)
+                    uri = 'http://127.0.0.1:9993/controller/network/' + str(memberid) + "______"
 
-                data = {"name": name,
-                        "private": True,
-                        "v4AssignMode": {"zt": True },
-                        "ipAssignmentPools": { "ipRangeStart": str(dhcp_start), "ipRangeEnd": str(dhcp_end) },
-                        "routes": [ str(cidr) ]}
-                jsonarray = json.dumps(data)
-                uri = 'http://127.0.0.1:9993/controller/network/' + str(memberid) + "______"
-
-                resp = zerotier_post(uri=uri, data=jsonarray)
+                    resp = zerotier_post(uri=uri, data=jsonarray)
+                    return True
             except Exception as e:
                 print str(e)
                 return False
-            finally:
-                return True
+            return False
 
 """ Class for handling MongoDB related user queries"""
 class User:
@@ -293,6 +296,9 @@ def dashboard():
 """ Network-Delete """
 @app.route('/network-delete', methods=['GET'])
 def networkdelete():
+    if session.get('logged_in') != True:
+        return login()
+
     GET_NETWORK_NWID = str(request.args.get('nwid'))
     result = Network().delete(nwid=GET_NETWORK_NWID)
     if result == True:
@@ -305,6 +311,10 @@ def networkdelete():
 """ Network-Create check """
 @app.route('/createnetworkcheck', methods=['POST'])
 def networkcreatecheck():
+    if session.get('logged_in') != True:
+        return login()
+
+
     POST_NETWORK_NAME = str(request.form['network-name'])
     POST_NETWORK_CIDR = str(request.form['network-cidr'])
     POST_NETWORK_DHCP_START = str(request.form['dhcp-start'])

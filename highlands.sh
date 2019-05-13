@@ -7,12 +7,20 @@
 #
 # =============================================================================
 
-# Change directory into hldata
+echo '    __  ___       __    __                __     '
+echo '   / / / (_)___ _/ /_  / /___ _____  ____/ /____ '
+echo '  / /_/ / / __ `/ __ \/ / __ `/ __ \/ __  / ___/ '
+echo ' / __  / / /_/ / / / / / /_/ / / / / /_/ (__  )  '
+echo '/_/ /_/_/\__, /_/ /_/_/\__,_/_/ /_/\__,_/____/   '
+echo '        /____/                                   '
+echo
+echo '==================================================='
+echo
+echo
+
+# Set dir
 script_dir=`dirname $0`
 cd $script_dir/hldata
-
-# Show highlands banner
-cat /opt/highlands/hldata/banner.txt && echo
 
 # Handle cli input
 case $1 in
