@@ -39,7 +39,7 @@
 											<div class="btn-group mr-2" role="group" aria-label="group">
 												<a type="button" class="btn btn-success" data-toggle="modal" data-target="#modal{{ network['id'] }}detail"> Detail </a>
 												<a type="button" class="btn btn-info" href="/network-members?nwid={{ network['id'] }}"> Members </a>
-												<a type="button" class="btn btn-warning"> Modify </a>
+												<a type="button" class="btn btn-warning"> Setup </a>
 												<a type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal{{ network['id'] }}delete"> Delete </a>
 											</div>
 										</div>
@@ -97,25 +97,23 @@
 								<input type="text" class="form-control" name="network-name" aria-describedby="network-name-help" placeholder="Enter Network Name">
 								<small id="network-name-help" class="form-text text-muted">Please enter desired network name. </small>
 							</div>
-								<!-- Network CIDR -->
+							<!--
 							<div class="form-group">
 								<label for="network-cidr"> Network CIDR </label>
 								<input type="text" class="form-control" name="network-cidr" aria-describedby="network-cidr-help" placeholder="Enter Network CIDR">
 								<small id="network-cidr-help" class="form-text text-muted">Please enter desired CIDR. Example: 192.168.1.0/24 </small>
 							</div>
-								<!-- DHCP Start -->
 							<div class="form-group">
 								<label for="dhcp-start"> DHCP Start </label>
 								<input type="text" class="form-control" name="dhcp-start" aria-describedby="dhcp-start-help" placeholder="Enter DHCP Start">
 								<small id="dhcp-start-help" class="form-text text-muted">Please enter desired DHCP Start address. Example: 192.168.1.5 </small>
 							</div>
-								<!-- DHCP End -->
 							<div class="form-group">
 								<label for="dhcp-end"> DHCP Start </label>
 								<input type="text" class="form-control" name="dhcp-end" aria-describedby="dhcp-end-help" placeholder="Enter DHCP End">
 								<small id="dhcp-end-help" class="form-text text-muted">Please enter desired DHCP Start address. Example: 192.168.1.200 </small>
 							</div>
-
+							-->
 								<!-- Submit -->
 							<button type="submit" class="btn btn-primary"> Submit </button>
 						</form>

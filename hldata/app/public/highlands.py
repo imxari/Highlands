@@ -121,24 +121,12 @@ class Network:
                 return False
             return False
     """ Handles creation of a network """
-    def create(self, name=None, cidr=None, dhcp_start=None, dhcp_end=None):
+    def create(self, name=None):
         if name == None:
-            return False
-        elif cidr == None:
-            return False
-        elif dhcp_start == None:
-            return False
-        elif dhcp_end == None:
             return False
         else:
             try:
                 if re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", name) != None:
-                    return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?\, ]", cidr) != None:
-                    return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_start) != None:
-                    return False
-                elif re.search("[a-z][A-Z][-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", dhcp_end) != None:
                     return False
                 else:
                     status = zerotier_get('http://127.0.0.1:9993/status')
@@ -148,9 +136,7 @@ class Network:
 
                     data = {"name": name,
                             "private": True,
-                            "v4AssignMode": {"zt": True },
-                            "ipAssignmentPools": { "ipRangeStart": str(dhcp_start), "ipRangeEnd": str(dhcp_end) },
-                            "routes": [ str(cidr) ]}
+                            "v4AssignMode": {"zt": True }}
                     jsonarray = json.dumps(data)
                     uri = 'http://127.0.0.1:9993/controller/network/' + str(memberid) + "______"
 
@@ -315,11 +301,8 @@ def networkcreatecheck():
 
 
     POST_NETWORK_NAME = str(request.form['network-name'])
-    POST_NETWORK_CIDR = str(request.form['network-cidr'])
-    POST_NETWORK_DHCP_START = str(request.form['dhcp-start'])
-    POST_NETWORK_DHCP_END = str(request.form['dhcp-end'])
 
-    result = Network().create(name=POST_NETWORK_NAME, cidr=POST_NETWORK_CIDR, dhcp_start=POST_NETWORK_DHCP_START, dhcp_end=POST_NETWORK_DHCP_END)
+    result = Network().create(name=POST_NETWORK_NAME)
 
     if result == True:
         flash("OK-CREATED")
