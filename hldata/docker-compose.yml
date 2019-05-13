@@ -1,20 +1,6 @@
 version: '3' # Don't touch this
 
 services: # Don't touch this
-#    highlands_mongodb: # Don't touch this
-#      container_name: $MONGO_NAME # Don't touch this
-#      image: mongo # Don't touch this
-#      restart: always
-#      environment: # Don't touch this
-#        MONGO_INITDB_ROOT_USERNAME: $MONGO_USER # Don't touch this
-#        MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASS # Don't touch this
-#      volumes:
-#          - mdb1:/data/db
-#          - mdb2:/data/configdb
-#      networks:
-#          - highlands
-#      ports: # Don't touch this
-#          - $MONGO_PORT:27017 # Don't touch this
     highlands_web:
         restart: unless-stopped
         build: # Don't touch this
@@ -34,8 +20,6 @@ services: # Don't touch this
 
 volumes:
     hl1:
-    mdb1:
-    mdb2:
 
 networks:
     highlands:
