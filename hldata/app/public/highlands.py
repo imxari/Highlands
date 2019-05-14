@@ -67,6 +67,38 @@ def zerotier_get(uri=None, data=None, params=None):
 
 """ Class for handling Zerotier-One network interactions """
 class Network:
+    """ Handles the setup of a network """
+    def setup(self, nwid=None, cidr=None, ipstart=None, ipend=None):
+        if nwid == None:
+            return False
+        elif cidr == None:
+            return False
+        elif ipstart == None:
+            return False
+        elif ipend == None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,.\/ ]", nwid) != None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\ ]", cidr) != None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", ipstart) != None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", ipend) != None:
+            return False
+        else:
+            try:
+                data = {"private": True,
+                        "v4AssignMode": { "zt": True },
+                        "ipAssignmentPools": { "ipRangeStart": ipstart, "ipRangeEnd": ipend },
+                        "routes": [ { "target": cidr } ]}
+                result = zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid, data=data)
+                print str(result)
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+            
     """ Handles the removal of a network """
     def delete(self, nwid=None):
         if nwid == None:
@@ -126,7 +158,6 @@ def networks():
         else:
             dicts.append(json.loads(network_info))
 
-    print str(dicts)
     return render_template('networks.html', networks=dicts)
 
 """ Dashboard """
@@ -139,7 +170,6 @@ def dashboard():
 
 """ Network-Delete """
 @app.route('/network-delete', methods=['GET'])
-@htpasswd.required
 def networkdelete():
     GET_NETWORK_NWID = str(request.args.get('nwid'))
     result = Network().delete(nwid=GET_NETWORK_NWID)
@@ -148,6 +178,23 @@ def networkdelete():
         return networks()
     else:
         flash("ERROR-DELETED")
+        return networks()
+
+""" Network-Setup check """
+@app.route('/setupnetworkcheck', methods=['POST'])
+def networksetupcheck():
+    POST_NETWORK_NWID = str(request.form['network-nwid'])
+    POST_NETWORK_CIDR = str(request.form['cidr'])
+    POST_NETWORK_IPSTART = str(request.form['ipassignment-start'])
+    POST_NETWORK_IPEND = str(request.form['ipassignment-end'])
+
+    result = Network().setup(nwid=POST_NETWORK_NWID, cidr=POST_NETWORK_CIDR, ipstart=POST_NETWORK_IPSTART, ipend=POST_NETWORK_IPEND)
+
+    if result == True:
+        flash("OK-SETUP")
+        return networks()
+    else:
+        flash("ERROR-SETUP")
         return networks()
 
 """ Network-Create check """
