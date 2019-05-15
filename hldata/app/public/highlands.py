@@ -3,10 +3,12 @@
 
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import os, json, random, string, re, sys
+import os, json, random, string, re, sys, urllib
 from bson.json_util import loads, dumps
 from zerotier import client as ztclient
 from flask_htpasswd import HtPasswdAuth
+from markupsafe import Markup
+
 
 """ Init the Flask application  """
 secret = os.urandom(2)
@@ -62,6 +64,15 @@ def zerotier_get(uri=None, data=None, params=None):
     resp = client.get(uri, data, headers, params, 'json')
     return resp.text
 
+# =============================================================================
+
+@app.template_filter('urlencode')
+def urlencode_filter(s):
+    if type(s) == 'Markup':
+        s = s.unescape()
+    s = s.encode('utf8')
+    s = urllib.quote_plus(s)
+    return Markup(s)
 
 # =============================================================================
 
@@ -89,16 +100,86 @@ class Network:
             try:
                 data = {"private": True,
                         "v4AssignMode": { "zt": True },
-                        "ipAssignmentPools": { "ipRangeStart": ipstart, "ipRangeEnd": ipend },
+                        "ipAssignmentPools": [{ "ipRangeStart": ipstart, "ipRangeEnd": ipend }],
                         "routes": [ { "target": cidr } ]}
-                result = zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid, data=data)
-                print str(result)
+                zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid, data=data)
                 return True
             except Exception as e:
                 print str(e)
                 return False
             return False
-            
+
+    """ Handles the adding of a network route """
+    def add_route(self, nwid=None, route=None, via=None):
+        if nwid == None:
+            return False
+        elif route == None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,.\/ ]", nwid) != None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\ ]", route) != None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\/ ]", via) != None:
+            return False
+        else:
+            try:
+                network = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + nwid)
+                network_json = loads(network)
+
+                routes = network_json['routes']
+                for element in routes:
+                    if element['target'] == route:
+                        return False
+
+                new_route = {"target": route,
+                             "via": via}
+                routes.append(new_route)
+
+                data = {"routes": routes}
+
+                zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid, data=data)
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+    """ Handles the removal of a networks route """
+    def delete_route(self, nwid=None, route=None):
+        if nwid == None:
+            return False
+        elif route == None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,.\/ ]", nwid) != None:
+            return False
+        elif re.search("[-!$%^&*()_+|~=`{}\[\]:\";'<>?,\ ]", route) != None:
+            return False
+        else:
+            try:
+                network = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + nwid)
+                network_json = loads(network)
+
+                routes = network_json['routes']
+
+                i = 0
+                for element in routes:
+                    if element['target'] == route:
+                        print "YES"
+                        del routes[i]
+                    ++i
+
+                print str(routes)
+
+                data = {"routes": routes}
+
+                zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid, data=data)
+
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+
+
     """ Handles the removal of a network """
     def delete(self, nwid=None):
         if nwid == None:
@@ -167,6 +248,37 @@ def dashboard():
     status_json = zerotier_get(uri='http://127.0.0.1:9993/status')
     status_dict = json.loads(status_json)
     return render_template('dashboard.html', status=status_dict)
+
+""" Route-Delete """
+@app.route('/route-delete', methods=['GET'])
+def routedelete():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    GET_ROUTE_TARGET = str(request.args.get('route'))
+    GET_ROUTE_TARGET_DECODED = str(urllib.unquote(GET_ROUTE_TARGET))
+    print str(GET_ROUTE_TARGET_DECODED)
+    result = Network().delete_route(nwid=GET_NETWORK_NWID, route=GET_ROUTE_TARGET_DECODED)
+    if result == True:
+        flash("OK-ROUTE-DELETED")
+        return networks()
+    else:
+        flash("ERROR-ROUTE-DELETED")
+        return networks()
+
+""" Route-Add """
+@app.route('/addroutecheck', methods=['POST'])
+def addroutecheck():
+    POST_NETWORK_NWID = str(request.form['network-nwid'])
+    POST_ROUTE_TARGET = str(request.form['target'])
+    POST_ROUTE_VIA = str(request.form['via'])
+
+    result = Network().add_route(POST_NETWORK_NWID, POST_ROUTE_TARGET, POST_ROUTE_VIA)
+
+    if result == True:
+        flash("OK-ROUTE-ADDED")
+        return networks()
+    else:
+        flash("ERROR-ROUTE-ADDED")
+        return networks()
 
 """ Network-Delete """
 @app.route('/network-delete', methods=['GET'])

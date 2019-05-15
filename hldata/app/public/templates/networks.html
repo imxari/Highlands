@@ -33,10 +33,11 @@
 									<td>
 										<div class="btn-toolbar" role="toolbar" aria-label="Network Management Toolbar">
 											<div class="btn-group mr-2" role="group" aria-label="group">
-												<a type="button" class="btn btn-success" data-toggle="modal" data-target="#modal{{ network['id'] }}detail"> Detail </a>
-												<a type="button" class="btn btn-info" href="/network-members?nwid={{ network['id'] }}"> Members </a>
-												<a type="button" class="btn btn-warning" data-toggle="modal" data-target="#modal{{ network['id'] }}setup"> Setup </a>
-												<a type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal{{ network['id'] }}delete"> Delete </a>
+												<a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ network['id'] }}detail"> Detail </a>
+												<a class="btn btn-info" href="/network-members?nwid={{ network['id'] }}" style="cursor: default; color: black;"> Members </a>
+												<a class="btn btn-warning" data-toggle="modal" data-target="#modal{{ network['id'] }}setup" style="color: black;"> Setup </a>
+												<a class="btn btn-success" data-toggle="modal" data-target="#modal{{ network['id'] }}routes"> Routes </a>
+												<a class="btn btn-danger" data-toggle="modal" data-target="#modal{{ network['id'] }}delete"> Delete </a>
 											</div>
 										</div>
 									</td>
@@ -71,6 +72,22 @@
 									<div class="alert alert-danger" role="alert">
 										<strong> Error! </strong> Network setup has failed!
 									</div>
+								{% elif message == "OK-ROUTE-DELETED" %}
+									<div class="alert alert-success" role="alert">
+										<strong> Success! </strong> Route was deleted!
+									</div>
+								{% elif message == "ERROR-ROUTE-DELETED" %}
+									<div class="alert alert-danger" role="alert">
+										<strong> Error! </strong> Route couldn't be deleted, route doesn't exist?
+									</div>
+								{% elif message == "OK-ROUTE-ADDED" %}
+									<div class="alert alert-success" role="alert">
+										<strong> Success! </strong> Route was added successfully!
+									</div>
+								{% elif message == "ERROR-ROUTE-ADDED" %}
+									<div class="alert alert-danger" role="alert">
+										<strong> Error! </strong> Route couldn't be added, route already exists?
+									</div>
 								{% endif %}
 							{% endfor %}
                                         	{% endif %}
@@ -101,23 +118,6 @@
 								<input type="text" class="form-control" name="network-name" aria-describedby="network-name-help" placeholder="Enter Network Name">
 								<small id="network-name-help" class="form-text text-muted">Please enter desired network name. </small>
 							</div>
-							<!--
-							<div class="form-group">
-								<label for="network-cidr"> Network CIDR </label>
-								<input type="text" class="form-control" name="network-cidr" aria-describedby="network-cidr-help" placeholder="Enter Network CIDR">
-								<small id="network-cidr-help" class="form-text text-muted">Please enter desired CIDR. Example: 192.168.1.0/24 </small>
-							</div>
-							<div class="form-group">
-								<label for="dhcp-start"> DHCP Start </label>
-								<input type="text" class="form-control" name="dhcp-start" aria-describedby="dhcp-start-help" placeholder="Enter DHCP Start">
-								<small id="dhcp-start-help" class="form-text text-muted">Please enter desired DHCP Start address. Example: 192.168.1.5 </small>
-							</div>
-							<div class="form-group">
-								<label for="dhcp-end"> DHCP Start </label>
-								<input type="text" class="form-control" name="dhcp-end" aria-describedby="dhcp-end-help" placeholder="Enter DHCP End">
-								<small id="dhcp-end-help" class="form-text text-muted">Please enter desired DHCP Start address. Example: 192.168.1.200 </small>
-							</div>
-							-->
 								<!-- Submit -->
 							<button type="submit" class="btn btn-primary"> Submit </button>
 						</form>
@@ -171,7 +171,90 @@
                                         </div>
                                 </div>
                         </div>
+			<div class="modal fade" id="modal{{ network['id'] }}addroute" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}addrouteTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                                <div class="modal-header">
+                                                        <h5 class="modal-title" id="modal{{ network['id'] }}addrouteTitle">Add Route: {{ network['name'] }} - {{ network['id'] }}</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria=label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                </div>
+                                                <div class="modal-body">
+							<form action="/addroutecheck" method="POST">
+                                                                <!-- Custom Route -->
+                                                                <div class="form-group">
+                                                                        <label for="cidr"> Target </label>
+									<input type="text" class="form-control" name="target" aria-describedby="routeDesc" placeholder="Enter target">
+                                                                        <small id="routeDesc" class="form-text text-muted">Example: 192.168.5.0/24 </small>
+                                                                </div>
+                                                                <!-- Custom Route -->
+                                                                <div class="form-group">
+                                                                        <label for="route"> Via </label>
+									<input type="text" class="form-control" name="via" aria-describedby="viaDesc" placeholder="Enter via address">
+                                                                        <small id="viaDesc" class="form-text text-muted">Example: 192.168.5.1 </small>
+                                                                </div>
 
+                                                                <!-- NWID -->
+                                                                <div class="form-group">
+                                                                        <input type="hidden" class="form-control" name="network-nwid" value="{{ network['id'] }}">
+                                                                </div>
+
+                                                                <!-- Submit -->
+                                                                <button type="submit" class="btn btn-primary"> Submit </button>
+							</form>
+                                                </div>
+                                        </div>
+				</div>
+			</div>
+
+			<div class="modal fade" id="modal{{ network['id'] }}routes" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}routesTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                                <div class="modal-header">
+                                                        <h5 class="modal-title" id="modal{{ network['id'] }}routesTitle">Routes: {{ network['name'] }} - {{ network['id'] }}</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria=label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                </div>
+                                                <div class="modal-body">
+							<table class="table">
+								<thead class="thead-dark">
+									<th scope="col"> Target </th>
+									<th scope="col"> Via </th>
+									<th scope="col"> Actions </th>
+								</thead>
+								<tbody>
+									{% for route in network['routes'] %}
+										{% if route is undefined %}
+											<tr>
+												<td> No routes found...</td>
+												<td></td>
+												<td></td>
+											</tr>
+										{% else %}
+											<tr>
+												<td> {{ route['target'] }} </td>
+												<td> {{ route['via'] }} </td>
+												<td>
+                                                                                        		<div class="btn-group mr-2" role="group" aria-label="group">
+                                                                                               			<a class="btn btn-danger" href="/route-delete?nwid={{ network['id'] }}&route={{ route['target'] | urlencode }}" style="cursor: default;color: black;"> Delete </a>
+                                                                                        		</div>
+												</td>
+											</tr>
+										{% endif %}
+									{% endfor %}
+									<tr>
+										<td> You can add additional routes, see Actions. </td>
+										<td></td>
+										<td> <a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ network['id'] }}addroute" data-dismiss="modal" style="cursor: default;color: black;"> + </a> </td>
+									</tr>
+								</tbody>
+							</table>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
                         <div class="modal fade" id="modal{{ network['id'] }}delete" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}deleteTitle" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
@@ -183,7 +266,7 @@
                                                 </div>
                                                 <div class="modal-body">
                                                 	<p> Are you sure that you want to delete this network? </p>
-							<a type="button" class="btn btn-danger" href="/network-delete?nwid={{ network['id'] }}"> Yes </a>
+							<a class="btn btn-danger" href="/network-delete?nwid={{ network['id'] }}"> Yes </a>
 							<button type="button" class="btn btn-warning" data-dismiss="modal" aria-label="No">
 								No
 							</button>
