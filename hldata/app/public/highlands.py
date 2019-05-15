@@ -3,7 +3,7 @@
 
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import os, json, random, string, re, sys, urllib
+import os, json, random, string, re, sys, urllib, ConfigParser
 from bson.json_util import loads, dumps
 from zerotier import client as ztclient
 from flask_htpasswd import HtPasswdAuth
@@ -74,7 +74,104 @@ def urlencode_filter(s):
     s = urllib.quote_plus(s)
     return Markup(s)
 
+@app.template_filter('member_desc')
+def memberdesc_filter(s):
+    desc = Member().get(s)
+    return desc
+
+@app.template_filter('member_detail')
+def memberdetail_filter(n, s):
+    member_detail = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + n + '/member/' + s)
+    member_detail_json = loads(member_detail)
+    return member_detail_json
+    
+@app.template_filter('members_list')
+def memberlist_filter(n):
+    member_list = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + n + '/member')
+    member_list_json = json.loads(member_list)
+    
+    members = list()
+    for k in member_list_json:
+        members.append(k)
+    
+    return members
+
 # =============================================================================
+
+""" Class for handling member desc interactions """
+class Member:
+    def bridge(self, nwid=None, address=None, bridged=None):
+        if nwid == None or nwid == "":
+            return False
+        if address == None or address == "":
+            return False
+        elif bridged == None:
+            return False
+        else:
+            try:
+                data = {"activeBridge": bridged}
+
+                zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid + '/member/' + address, data=data)
+
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+
+    def auth(self, nwid=None, address=None, authed=None):
+        if nwid == None or nwid == "":
+            return False
+        if address == None or address == "":
+            return False
+        elif authed == None:
+            return False
+        else:
+            try:
+                data = {"authorized": authed}
+
+                zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid + '/member/' + address, data=data)
+
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+    def get(self, address=None):
+        if address == None or address == "":
+            return None
+        elif os.path.exists("/app/members.ini") == False:
+            return None
+        else:
+            config = ConfigParser.ConfigParser()
+            config.read('/app/members.ini')
+            
+            desc = config.get("DESCRIPTIONS", address)
+            return Markup(desc)
+
+    def add(self, address=None, description=None):
+        if address == None or address == "":
+            return None
+        elif description == None or description == "":
+            return None
+        else:
+            try:
+                config = ConfigParser.ConfigParser()
+                config.read('/app/members.ini')
+
+                if config.has_section("DESCRIPTIONS") == False:
+                    config.add_section("DESCRIPTIONS")
+
+                config.set("DESCRIPTIONS", address, description)
+
+                with open('/app/members.ini', 'w') as f:
+                    config.write(f)
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+            
 
 """ Class for handling Zerotier-One network interactions """
 class Network:
@@ -143,6 +240,7 @@ class Network:
                 print str(e)
                 return False
             return False
+
     """ Handles the removal of a networks route """
     def delete_route(self, nwid=None, route=None):
         if nwid == None:
@@ -192,9 +290,10 @@ class Network:
                 print str(e)
                 return False
             return False
+
     """ Handles creation of a network """
     def create(self, name=None):
-        if name == None:
+        if name == None or name == "":
             return False
         elif len(name) >= 33:
             return False
@@ -249,19 +348,89 @@ def dashboard():
     status_dict = json.loads(status_json)
     return render_template('dashboard.html', status=status_dict)
 
+""" Add-MemberDesc """
+@app.route('/setmemberdesc', methods=['POST'])
+def addmemberdesc():
+    POST_MEMBER_ID = str(request.form['memberid'])
+    POST_MEMBER_DESC = str(request.form['description'])
+
+    result = Member().add(address=POST_MEMBER_ID, description=POST_MEMBER_DESC)
+
+    if result == True:
+        flash("Success! Member description set!")
+        return networks()
+    else:
+        flash("Error! Member description couldn't be set!")
+        return networks()
+
+""" Member-UnBridge """
+@app.route('/member-unbridge', methods=['GET'])
+def memberunbridge():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    GET_MEMBER_ADDRESS = str(request.args.get('address'))
+
+    result = Member().bridge(nwid=GET_NETWORK_NWID, address=GET_MEMBER_ADDRESS, bridged=False)
+    if result == True:
+        flash("Success! Member unbridged!")
+        return networks()
+    else:
+        flash("Error! Member couldn't be unbridged!")
+        return networks()
+
+""" Member-Bridge """
+@app.route('/member-bridge', methods=['GET'])
+def memberbridge():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    GET_MEMBER_ADDRESS = str(request.args.get('address'))
+
+    result = Member().bridge(nwid=GET_NETWORK_NWID, address=GET_MEMBER_ADDRESS, bridged=True)
+    if result == True:
+        flash("Success! Member bridged!")
+        return networks()
+    else:
+        flash("Error! Member couldn't be bridged!")
+        return networks()
+
+""" Member-UnAuth """
+@app.route('/member-unauth', methods=['GET'])
+def memberunauth():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    GET_MEMBER_ADDRESS = str(request.args.get('address'))
+
+    result = Member().auth(nwid=GET_NETWORK_NWID, address=GET_MEMBER_ADDRESS, authed=False)
+    if result == True:
+        flash("Success! Member unauthorized!")
+        return networks()
+    else:
+        flash("Error! Member couldn't be unauthorized!")
+        return networks()
+
+""" Member-Auth """
+@app.route('/member-auth', methods=['GET'])
+def memberauth():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    GET_MEMBER_ADDRESS = str(request.args.get('address'))
+
+    result = Member().auth(nwid=GET_NETWORK_NWID, address=GET_MEMBER_ADDRESS, authed=True)
+    if result == True:
+        flash("Success! Member authorized!")
+        return networks()
+    else:
+        flash("Error! Member couldn't be authorized!")
+        return networks()
+
 """ Route-Delete """
 @app.route('/route-delete', methods=['GET'])
 def routedelete():
     GET_NETWORK_NWID = str(request.args.get('nwid'))
     GET_ROUTE_TARGET = str(request.args.get('route'))
     GET_ROUTE_TARGET_DECODED = str(urllib.unquote(GET_ROUTE_TARGET))
-    print str(GET_ROUTE_TARGET_DECODED)
     result = Network().delete_route(nwid=GET_NETWORK_NWID, route=GET_ROUTE_TARGET_DECODED)
     if result == True:
-        flash("OK-ROUTE-DELETED")
+        flash("Success! Route was deleted!")
         return networks()
     else:
-        flash("ERROR-ROUTE-DELETED")
+        flash("Error! Route couldn't be deleted!")
         return networks()
 
 """ Route-Add """
@@ -274,10 +443,10 @@ def addroutecheck():
     result = Network().add_route(POST_NETWORK_NWID, POST_ROUTE_TARGET, POST_ROUTE_VIA)
 
     if result == True:
-        flash("OK-ROUTE-ADDED")
+        flash("Success! Route was added successfully")
         return networks()
     else:
-        flash("ERROR-ROUTE-ADDED")
+        flash("Error! Route couldn't be added!")
         return networks()
 
 """ Network-Delete """
@@ -286,10 +455,10 @@ def networkdelete():
     GET_NETWORK_NWID = str(request.args.get('nwid'))
     result = Network().delete(nwid=GET_NETWORK_NWID)
     if result == True:
-        flash("OK-DELETED")
+        flash("Success! Network was deleted!")
         return networks()
     else:
-        flash("ERROR-DELETED")
+        flash("Error! Network couldn't be deleted!")
         return networks()
 
 """ Network-Setup check """
@@ -303,10 +472,10 @@ def networksetupcheck():
     result = Network().setup(nwid=POST_NETWORK_NWID, cidr=POST_NETWORK_CIDR, ipstart=POST_NETWORK_IPSTART, ipend=POST_NETWORK_IPEND)
 
     if result == True:
-        flash("OK-SETUP")
+        flash("Success! IP Assignments and default route set!")
         return networks()
     else:
-        flash("ERROR-SETUP")
+        flash("Error! Couldn't set IP Assignments or default route!")
         return networks()
 
 """ Network-Create check """
@@ -317,10 +486,10 @@ def networkcreatecheck():
     result = Network().create(name=POST_NETWORK_NAME)
 
     if result == True:
-        flash("OK-CREATED")
+        flash("Success! Network was created!")
         return networks()
     else:
-        flash("ERROR-CREATED")
+        flash("Error! Network couldn't be created!")
         return networks()
 
 # =============================================================================

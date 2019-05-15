@@ -62,7 +62,7 @@ case $1 in
 		fi;;
 	"start")
 		# Start Highlands
-		docker-compose -d
+		docker-compose up -d
 
 		# Check to see if that command executed successfully
 		if [ $? -eq 0 ]; then
