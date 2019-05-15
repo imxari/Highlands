@@ -89,12 +89,8 @@ def memberdetail_filter(n, s):
 def memberlist_filter(n):
     member_list = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + n + '/member')
     member_list_json = json.loads(member_list)
-    
-    members = list()
-    for k in member_list_json:
-        members.append(k)
-    
-    return members
+
+    return member_list_json
 
 # =============================================================================
 

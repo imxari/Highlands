@@ -192,13 +192,13 @@
                                     <th scope="col"> Actions </th>
                                 </thead>
                                 <tbody>
+                                    {% if members|length <= 0 %}
+                                            <tr>
+                                                <td> No members found...</td>
+                                                <td></td>
+                                            </tr>
+                                    {% endif %}
                                     {% for member in members %}
-                                        {% if member is undefined %}
-                                        <tr>
-                                            <td> No members found...</td>
-                                            <td></td>
-                                        </tr>
-                                        {% else %}
                                         <tr>
                                             <td>
                                                 {% if member | member_desc is undefined %}
@@ -207,14 +207,13 @@
                                                     {{ member | member_desc }}
                                                 {% endif %}
                                             </td>
-
                                             <td>
                                                 {{ member }}
                                             </td>
                                             <td>
                                                 <div class="btn-group mr-2" role="group" aria-label="group" style="width: auto;">
-                                                    <a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ key }}memberdesc" data-dismiss="modal" style="cursor: default;color: black;"> Description </a>
-                                                    <a class="btn btn-info" data-toggle="modal" data-target="#modal{{ key }}ipmanagement" data-dismiss="modal" style="cursor: default;color: black;"> IP Management </a>
+                                                    <a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ member }}memberdesc" data-dismiss="modal" style="cursor: default;color: black;"> Description </a>
+                                                    <a class="btn btn-info" data-toggle="modal" data-target="#modal{{ member }}ipmanagement" data-dismiss="modal" style="cursor: default;color: black;"> IP Management </a>
                                                     {% set md = network['id'] | member_detail(member) %}
 
                                                     {% if md['authorized'] == true %}
@@ -239,7 +238,7 @@
                                                                 <input type="checkbox" class="custom-control-input" id="bridge{{ member }}">
                                                                 <label class="custom-control-label" for="bridge{{ member }}">Bridged</label>
                                                             </div>
-                                                    {% endif %}
+                                                        {% endif %}
                                                     
                                                     <script>
                                                         $(document).ready(function() {
@@ -269,7 +268,6 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                        {% endif %}
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -364,46 +362,46 @@
                     </div>
                 </div>
             </div>
+            
+            {% for member in members %}
+
+                <!-- Create network modal -->
+                <div class="modal fade" id="modal{{ member }}memberdesc" tabindex="-1" role="dialog" aria-labelledby="memberDescTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="memberDescTitle">Member: {{ member }}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/setmemberdesc" method="POST">
+                                    <!-- Description -->
+                                    <div class="form-group">
+                                        <label for="network-name"> Description </label>
+                                        <input type="text" class="form-control" name="description" aria-describedby="desc-help" placeholder="Enter Description">
+                                        <small id="desc-help" class="form-text text-muted">Please enter desired description of this member. </small>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <input type="hidden" class="form-control" name="memberid" value="{{ member }}">
+                                    </div>
+
+                                    <!-- Submit -->
+                                    <button type="submit" class="btn btn-primary"> Submit </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+            
         {% endfor %}
 
-		{% for member in members %}
-			{% for key in member %}
 
-				<!-- Create network modal -->
-				<div class="modal fade" id="modal{{ key }}memberdesc" tabindex="-1" role="dialog" aria-labelledby="memberDescTitle" aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered" role="document">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="memberDescTitle">Member: {{ key }}</h5>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-								<div class="modal-body">
-									<form action="/setmemberdesc" method="POST">
-										<!-- Description -->
-										<div class="form-group">
-											<label for="network-name"> Description </label>
-											<input type="text" class="form-control" name="description" aria-describedby="desc-help" placeholder="Enter Description">
-											<small id="desc-help" class="form-text text-muted">Please enter desired description of this member. </small>
-										</div>
-
-
-										<div class="form-group">
-											<input type="hidden" class="form-control" name="memberid" value="{{ key  }}">
-										</div>
-
-										<!-- Submit -->
-										<button type="submit" class="btn btn-primary"> Submit </button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			{% endfor %}
-		{% endfor %}
 
 	</body>
 </html>
