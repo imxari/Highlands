@@ -1,7 +1,7 @@
 # Highlands
 
 ## Warning
-Highlands is currently in ALPHA stages of development and may not be fully functional. When using this project at this current point in time expect issues.
+Highlands is currently in BETA stages of development and may not be fully functional. When using this project at this current point in time expect issues.
 
 ## Prerequisites
 ------
