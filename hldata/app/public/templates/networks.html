@@ -267,34 +267,34 @@
 
                                                     {% if md['authorized'] == true %}
                                                             <div class="custom-control custom-checkbox" style="padding-left: 40px; padding-top: 7px;">
-                                                                <input type="checkbox" class="custom-control-input" id="auth{{ member }}" checked>
-                                                                <label class="custom-control-label" for="auth{{ member }}">Authorised</label>
+                                                                <input type="checkbox" class="custom-control-input" id="auth{{ network['id'] }}{{ member }}" checked>
+                                                                <label class="custom-control-label" for="auth{{ network['id'] }}{{ member }}">Authorised</label>
                                                             </div>
                                                         {% elif md['authorized'] == false %}
                                                             <div class="custom-control custom-checkbox" style="padding-left: 40px; padding-top: 7px;">
-                                                                <input type="checkbox" class="custom-control-input" id="auth{{ member }}">
-                                                                <label class="custom-control-label" for="auth{{ member }}">Authorised</label>
+                                                                <input type="checkbox" class="custom-control-input" id="auth{{ network['id'] }}{{ member }}">
+                                                                <label class="custom-control-label" for="auth{{ network['id'] }}{{ member }}">Authorised</label>
                                                             </div>
                                                         {% endif %}
 
                                                         {% if md['activeBridge'] == true %}
                                                             <div class="custom-control custom-checkbox" style="padding-left: 40px; padding-top: 7px;">
-                                                                <input type="checkbox" class="custom-control-input" id="bridge{{ member }}" checked>
-                                                                <label class="custom-control-label" for="bridge{{ member }}">Bridged</label>
+                                                                <input type="checkbox" class="custom-control-input" id="bridge{{ network['id'] }}{{ member }}" checked>
+                                                                <label class="custom-control-label" for="bridge{{ network['id'] }}{{ member }}">Bridged</label>
                                                             </div>
                                                         {% elif md['activeBridge'] == false %}
                                                             <div class="custom-control custom-checkbox" style="padding-left: 40px; padding-top: 7px;">
-                                                                <input type="checkbox" class="custom-control-input" id="bridge{{ member }}">
-                                                                <label class="custom-control-label" for="bridge{{ member }}">Bridged</label>
+                                                                <input type="checkbox" class="custom-control-input" id="bridge{{ network['id'] }}{{ member }}">
+                                                                <label class="custom-control-label" for="bridge{{ network['id'] }}{{ member }}">Bridged</label>
                                                             </div>
                                                         {% endif %}
                                                     
                                                     <script>
                                                         $(document).ready(function() {
-                                                            $('#auth{{ member }}').val(this.checked);
-                                                            $('#bridge{{ member }}').val(this.checked);
+                                                            $('#auth{{ network['id'] }}{{ member }}').val(this.checked);
+                                                            $('#bridge{{ network['id'] }}{{ member }}').val(this.checked);
                                                             
-                                                            $('#auth{{ member }}').change(function() {
+                                                            $('#auth{{ network['id'] }}{{ member }}').change(function() {
                                                                 if (this.checked) {
                                                                     window.location.href = "/member-auth?nwid={{ network['id'] }}&address={{ member }}";
                                                                 } else {
@@ -302,7 +302,7 @@
                                                                 }
                                                             });
                                                             
-                                                            $('#bridge{{ member }}').change(function() {
+                                                            $('#bridge{{ network['id'] }}{{ member }}').change(function() {
                                                                 if (this.checked) {
                                                                     window.location.href = "/member-bridge?nwid={{ network['id'] }}&address={{ member }}";
                                                                 } else {
