@@ -30,14 +30,13 @@
 								<td> {{ network['name'] }} </td>
 								<td> {{ network['id'] }} </td>
 								<td>
-									<div class="dropdown">
-									    <button class="btn btn-warning dropdown-toggle" type="button" id="networkActionDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Manage </button>
-										<div class="dropdown-menu" aria-labelledby="networkActionDropdown">
-											<a class="dropdown-item" data-toggle="modal" data-target="#modal{{ network['id'] }}detail" style="color: black;"> Detail </a>
-											<a class="dropdown-item" data-toggle="modal" data-target="#modal{{ network['id'] }}members" style="color: black;"> Members </a>
-											<a class="dropdown-item" data-toggle="modal" data-target="#modal{{ network['id'] }}setup" style="color: black;"> Setup </a>
-											<a class="dropdown-item" data-toggle="modal" data-target="#modal{{ network['id'] }}routes" style="color: black;"> Routes </a>
-											<a class="dropdown-item" data-toggle="modal" data-target="#modal{{ network['id'] }}delete" style="color: black;"> Delete </a>
+									<div class="btn-toolbar" role="toolbar" aria-label="Network Management Toolbar">
+										<div class="btn-group" role="group" aria-label="group">
+											<a class="btn btn-secondary" data-toggle="modal" data-target="#modal{{ network['id'] }}detail" style="color: white;"> Detail </a>
+											<a class="btn btn-secondary" data-toggle="modal" data-target="#modal{{ network['id'] }}members" style="color: white;"> Members </a>
+											<a class="btn btn-secondary" data-toggle="modal" data-target="#modal{{ network['id'] }}setup" style="color: white;"> Setup </a>
+											<a class="btn btn-secondary" data-toggle="modal" data-target="#modal{{ network['id'] }}routes" style="color: white;"> Routes </a>
+											<a class="btn btn-secondary" data-toggle="modal" data-target="#modal{{ network['id'] }}delete" style="color: white;"> Delete </a>
 										</div>
 									</div>
 								</td>
@@ -133,7 +132,7 @@
                                 </div>
 
                                 <!-- Submit -->
-                                <button type="submit" class="btn btn-success"> Submit </button>	
+                                <button type="submit" class="btn btn-primary"> Submit </button>	
                             </form>
                         </div>
                     </div>
@@ -171,7 +170,7 @@
                                 </div>
 
                                 <!-- Submit -->
-                                <button type="submit" class="btn btn-success"> Submit </button>
+                                <button type="submit" class="btn btn-primary"> Submit </button>
                             </form>
                         </div>
                     </div>
@@ -210,7 +209,7 @@
                                 </div>
 
                                 <!-- Submit -->
-                                <button type="submit" class="btn btn-success"> Submit </button>
+                                <button type="submit" class="btn btn-primary"> Submit </button>
                             </form>
                         </div>
                     </div>
@@ -255,14 +254,8 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group mr-2" role="group" aria-label="group" style="width: auto;">
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-warning dropdown-toggle" type="button" id="{{ network ['id'] }}{{ member }}membermgt" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Manage </button>
-                                                        <div class="dropdown-menu" aria=labelledby="{{ network ['id'] }}{{ member }}membermgt">
-                                                            <a class="dropdown-item" data-toggle="modal" data-target="#modal{{ member }}memberdesc" data-dismiss="modal" style="cursor: default;color: black;"> Description </a>
-                                                            <a class="dropdown-item" data-toggle="modal" data-target="#modal{{ network['id'] }}{{ member }}ipassignments" data-dismiss="modal" style="cursor: default;color: black;"> IP Management </a>
-                                                            <a class="dropdown-item" href="/delete-member?nwid={{ network['id'] }}&address={{ member }}" style="cursor: default; color: black;"> Delete </a>
-                                                        </div>
-                                                     </div>
+                                                    <a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ member }}memberdesc" data-dismiss="modal" style="cursor: default;color: black;"> Description </a>
+                                                    <a class="btn btn-info" data-toggle="modal" data-target="#modal{{ network['id'] }}{{ member }}ipassignments" data-dismiss="modal" style="cursor: default;color: black;"> IP Management </a>
                                                     {% set md = network['id'] | member_detail(member) %}
 
                                                     {% if md['authorized'] == true %}
@@ -327,7 +320,7 @@
 
             <!-- Network routes modal -->
             <div class="modal fade" id="modal{{ network['id'] }}routes" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}routesTitle" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal{{ network['id'] }}routesTitle">Routes: {{ network['name'] }} - {{ network['id'] }}</h5>
@@ -336,7 +329,6 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ network['id'] }}addroute" data-dismiss="modal" style="cursor: default;color: black; margin-bottom: 10px;"> Add Route </a>
                             <table class="table">
                             <thead class="thead-dark">
                             <th scope="col"> Target </th>
@@ -363,6 +355,11 @@
                                                 </tr>
                                         {% endif %}
                                     {% endfor %}
+                                    <tr>
+                                        <td> You can add additional routes, see Actions. </td>
+                                        <td></td>
+                                        <td> <a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ network['id'] }}addroute" data-dismiss="modal" style="cursor: default;color: black;"> + </a> </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -403,7 +400,6 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <a class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal{{ network['id'] }}{{ member }}addipassignment" style="cursor: default;color: black; margin-bottom: 10px;"> Add IP Address </a>
                             {% set md = network['id'] | member_detail(member) %}
                             <table class="table">
                                 <thead class="thead-dark">
@@ -428,6 +424,7 @@
                                     {% endif %}
                                     <tr>
                                         <td>You can add additional IP Addresses to this member, see Actions.</td>
+                                        <td> <a class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal{{ network['id'] }}{{ member }}addipassignment" style="cursor: default;color: black;"> + </a> </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -476,12 +473,13 @@
                                         <small id="desc-help" class="form-text text-muted">Please enter desired description of this member. </small>
                                     </div>
 
+
                                     <div class="form-group">
                                         <input type="hidden" class="form-control" name="memberid" value="{{ member }}">
                                     </div>
 
                                     <!-- Submit -->
-                                    <button type="submit" class="btn btn-success"> Submit </button>
+                                    <button type="submit" class="btn btn-primary"> Submit </button>
                                 </form>
                             </div>
                         </div>

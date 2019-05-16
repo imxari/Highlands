@@ -98,6 +98,19 @@ def memberlist_filter(n):
 
 """ Class for handling member desc interactions """
 class Member:
+    def delete_member(self, nwid=None, address=None):
+        if nwid == None or nwid == "":
+            return False
+        elif address == None or nwid == "":
+            return False
+        else:
+            try:
+                zerotier_delete(uri='http://127.0.0.1:9993/controller/network/' + nwid + '/member/' + address)
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
     def delete_ipassignment(self, nwid=None, address=None, ip=None):
         if nwid == None or nwid == "":
             return False
@@ -423,6 +436,21 @@ def memberunbridge():
         return networks()
     else:
         flash("Error! Member couldn't be unbridged!")
+        return networks()
+
+""" Delete-Member """
+@app.route('/delete-member', methods=['GET'])
+def deletemember():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    GET_MEMBER_ADDRESS = str(request.args.get('address'))
+
+    result = Member().delete_member(nwid=GET_NETWORK_NWID, address=GET_MEMBER_ADDRESS)
+
+    if result == True:
+        flash("Success! Member was deleted!")
+        return networks()
+    else:
+        flash("Error! Member couldn't be deleted!")
         return networks()
 
 """ Delete-IPAssignment """
