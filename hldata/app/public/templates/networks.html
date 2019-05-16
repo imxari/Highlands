@@ -93,6 +93,7 @@
 
         {% for network in networks %}
             {% set members = network['id'] | members_list %}
+            <!-- Network setup modal -->
             <div class="modal fade" id="modal{{ network['id'] }}setup" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}setupTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -137,7 +138,47 @@
                     </div>
                 </div>
             </div>
-                        
+
+        {% for member in members %}
+        <!-- Add IP Assignment modal -->
+	    <div class="modal fade" id="modal{{ network['id'] }}{{ member }}addipassignment" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}{{ member }}addipassignmentTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+        				<h5 class="modal-title" id="modal{{ network['id'] }}{{ member }}addipassignmentTitle">Add IP Assignment: {{ member }} - {{ network['name'] }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria=label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/addipassignmentcheck" method="POST">
+                                <!-- IP Address -->
+                                <div class="form-group">
+                                    <label for="ip"> IP Address </label>
+                                    <input type="text" class="form-control" name="ip" aria-describedby="ipDesc" placeholder="Enter IP Address">
+                                    <small id="ipDesc" class="form-text text-muted">Example: 192.168.5.20 </small>
+                                </div>
+
+                                <!-- Address -->
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" name="address" value="{{ member }}">
+                                </div>
+
+                                <!-- NWID -->
+                                <div class="form-group">
+                                    <input type="hidden" class="form-control" name="network-nwid" value="{{ network['id'] }}">
+                                </div>
+
+                                <!-- Submit -->
+                                <button type="submit" class="btn btn-primary"> Submit </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Add route modal -->
             <div class="modal fade" id="modal{{ network['id'] }}addroute" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}addrouteTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -175,6 +216,7 @@
                 </div>
             </div>
 
+            <!-- Member information modal -->
             <div class="modal fade" id="modal{{ network['id'] }}members" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}membersTitle" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -213,7 +255,7 @@
                                             <td>
                                                 <div class="btn-group mr-2" role="group" aria-label="group" style="width: auto;">
                                                     <a class="btn btn-primary" data-toggle="modal" data-target="#modal{{ member }}memberdesc" data-dismiss="modal" style="cursor: default;color: black;"> Description </a>
-                                                    <a class="btn btn-info" data-toggle="modal" data-target="#modal{{ member }}ipmanagement" data-dismiss="modal" style="cursor: default;color: black;"> IP Management </a>
+                                                    <a class="btn btn-info" data-toggle="modal" data-target="#modal{{ network['id'] }}{{ member }}ipassignments" data-dismiss="modal" style="cursor: default;color: black;"> IP Management </a>
                                                     {% set md = network['id'] | member_detail(member) %}
 
                                                     {% if md['authorized'] == true %}
@@ -276,6 +318,7 @@
                 </div>
             </div>
 
+            <!-- Network routes modal -->
             <div class="modal fade" id="modal{{ network['id'] }}routes" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}routesTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -324,6 +367,7 @@
                 </div>
             </div>
 
+            <!-- Network delete modal -->
             <div class="modal fade" id="modal{{ network['id'] }}delete" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}deleteTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -344,13 +388,58 @@
                 </div>
             </div>
 
-
+	    {% for member in members %}
+	        <!-- Member IP assignment modal -->
+            <div class="modal fade" id="modal{{ network['id'] }}{{ member }}ipassignments" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}{{member}}ipassignmentsTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal{{ network['id'] }}{{ member }}ipassignmentsTitle">IP Assignments: {{ member }} - {{ network['name'] }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria=label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {% set md = network['id'] | member_detail(member) %}
+                            <table class="table">
+                                <thead class="thead-dark">
+                                    <th scope="col"> IP Address </th>
+                                    <th scope="col"> Action </th>
+                                </th>
+                                <tbody>
+                                    {% if md is undefined or md|length <= 0 %}
+                                        <tr>
+                                            <td> No IP Assignments found... </td>
+                                            <td></td>
+                                        </tr>
+                                    {% else %}
+                                        {% for ip in md['ipAssignments'] %}
+                                            <tr>
+                                                <td> {{ ip }} </td>
+                                                <td>
+                                                    <a class="btn btn-danger" href="/delete-ipassignment?nwid={{ network['id'] }}&address={{ member }}&ip={{ ip }}" style="pointer: default; color: black;"> Delete </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <tr>
+                                        <td></td>
+                                        <td> <a class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#modal{{ network['id'] }}{{ member }}addipassignment" style="cursor: default;color: black;"> + </a> </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+	    {% endfor %}
+            <!-- Network detail modal -->
             <div class="modal fade" id="modal{{ network['id'] }}detail" tabindex="-1" role="dialog" aria-labelledby="modal{{ network['id'] }}detailTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal{{ network['id'] }}detailTitle">Detail: {{ network['name'] }} - {{ network['id'] }}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria=label="Close">
+                            <button type="button" class="close" data-dismiss="modal" aira-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -365,7 +454,7 @@
             
             {% for member in members %}
 
-                <!-- Create network modal -->
+                <!-- Description modal -->
                 <div class="modal fade" id="modal{{ member }}memberdesc" tabindex="-1" role="dialog" aria-labelledby="memberDescTitle" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">

@@ -76,6 +76,8 @@ def urlencode_filter(s):
 
 @app.template_filter('member_desc')
 def memberdesc_filter(s):
+    if type(s) == 'Markup':
+        s = s.unescape()
     desc = Member().get(s)
     return desc
 
@@ -84,7 +86,7 @@ def memberdetail_filter(n, s):
     member_detail = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + n + '/member/' + s)
     member_detail_json = loads(member_detail)
     return member_detail_json
-    
+
 @app.template_filter('members_list')
 def memberlist_filter(n):
     member_list = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + n + '/member')
@@ -96,6 +98,57 @@ def memberlist_filter(n):
 
 """ Class for handling member desc interactions """
 class Member:
+    def delete_ipassignment(self, nwid=None, address=None, ip=None):
+        if nwid == None or nwid == "":
+            return False
+        elif address == None or address == "":
+            return False
+        elif ip == None or ip == "":
+            return False
+        else:
+            try:
+                member_info = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + nwid + '/member/' + address)
+                member_info_json = json.loads(member_info)
+
+                ipassignments = member_info_json['ipAssignments']
+
+                for ipa in ipassignments:
+                    if ipa == ip:
+                        ipassignments.remove(ipa)
+
+                data = {"ipAssignments": ipassignments}
+                zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid + '/member/' + address, data=data)
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+
+    def add_ipassignment(self, nwid=None, address=None, ip=None):
+        if nwid == None or nwid == "":
+            return False
+        elif address == None or address == "":
+            return False
+        elif ip == None or ip == "":
+            return False
+        else:
+            try:
+                member_info = zerotier_get(uri='http://127.0.0.1:9993/controller/network/' + nwid + '/member/' + address)
+                member_info_json = json.loads(member_info)
+
+                ipassignments = member_info_json['ipAssignments']
+
+                if ip not in ipassignments:
+                    ipassignments.append(ip)
+
+                data = {"ipAssignments": ipassignments}
+                zerotier_post(uri='http://127.0.0.1:9993/controller/network/' + nwid + '/member/' + address, data=data)
+                return True
+            except Exception as e:
+                print str(e)
+                return False
+            return False
+
     def bridge(self, nwid=None, address=None, bridged=None):
         if nwid == None or nwid == "":
             return False
@@ -141,9 +194,13 @@ class Member:
         else:
             config = ConfigParser.ConfigParser()
             config.read('/app/members.ini')
-            
-            desc = config.get("DESCRIPTIONS", address)
-            return Markup(desc)
+
+            if config.has_option("DESCRIPTIONS", address):
+                desc = config.get("DESCRIPTIONS", address)
+                return Markup(desc)
+            else:
+                return None
+            return None
 
     def add(self, address=None, description=None):
         if address == None or address == "":
@@ -167,7 +224,6 @@ class Member:
                 print str(e)
                 return False
             return False
-            
 
 """ Class for handling Zerotier-One network interactions """
 class Network:
@@ -257,11 +313,8 @@ class Network:
                 i = 0
                 for element in routes:
                     if element['target'] == route:
-                        print "YES"
                         del routes[i]
                     ++i
-
-                print str(routes)
 
                 data = {"routes": routes}
 
@@ -321,7 +374,6 @@ class Network:
 @app.route('/networks')
 def networks():
     networks_json = zerotier_get(uri='http://127.0.0.1:9993/controller/network')
-    
     networks_dict = json.loads(networks_json)
 
     dicts = list()
@@ -371,6 +423,38 @@ def memberunbridge():
         return networks()
     else:
         flash("Error! Member couldn't be unbridged!")
+        return networks()
+
+""" Delete-IPAssignment """
+@app.route('/delete-ipassignment', methods=['GET'])
+def deleteipassignment():
+    GET_NETWORK_NWID = str(request.args.get('nwid'))
+    GET_MEMBER_ADDRESS = str(request.args.get('address'))
+    GET_MEMBER_IPASSIGNMENT = str(request.args.get('ip'))
+
+    result = Member().delete_ipassignment(nwid=GET_NETWORK_NWID, address=GET_MEMBER_ADDRESS, ip=GET_MEMBER_IPASSIGNMENT)
+
+    if result == True:
+        flash("Success! IP Assignment was deleted!")
+        return networks()
+    else:
+        flash("Error! IP Assignment couldn't be deleted")
+        return networks()
+
+""" Add-IPAssignment """
+@app.route('/addipassignmentcheck', methods=['POST'])
+def addipassignment():
+    GET_NETWORK_NWID = str(request.form['network-nwid'])
+    GET_MEMBER_ADDRESS = str(request.form['address'])
+    GET_MEMBER_IPASSIGNMENT = str(request.form['ip'])
+
+    result = Member().add_ipassignment(nwid=GET_NETWORK_NWID, address=GET_MEMBER_ADDRESS, ip=GET_MEMBER_IPASSIGNMENT)
+
+    if result == True:
+        flash("Success! IP Assignment was added!")
+        return networks()
+    else:
+        flash("Error! IP Assignment couldn't be added")
         return networks()
 
 """ Member-Bridge """
