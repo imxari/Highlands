@@ -20,7 +20,7 @@ To install Highlands please follow the steps below:
 1. Clone the repository:  
 ``` cd /tmp && git clone https://github.com/h0lysp4nk/Highlands.git && mv /tmp/Highlands /opt/highlands ```
 2. After cloning the repository we need to generate a .htpasswd file by running the following command:  
-``` htpasswd -c /opt/hldata/app/.htpasswd <your_username> ```  
+``` htpasswd -c /opt/highlands/hldata/app/.htpasswd <your_username> ```  
 If you want to add another user in the future use the command below and copy the stdout to the .htpasswd file:  
 ``` htpasswd -n <your_username> ```
 3. Now we've setup the authentication enter the directory of the repository and run the bash script:   
@@ -38,5 +38,5 @@ If you're experiencing any issues with Highlands please open an issue under this
 
 ## Credits
 ------
-**zailbon** - Created the Zerotier API used in this project: https://github.com/zero-os/zerotier_client
+**lflare** - Created the Zerotier API used in this project: https://github.com/lflare/zerotier-nc
 
