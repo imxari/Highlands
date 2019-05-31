@@ -1,0 +1,30 @@
+swagger: "2.0"
+info:
+  description: © 2019 Copyright H0lysp4nk All Rights Reserved.
+  version: "0.5.6"
+  title: Highlands REST API
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+basePath: "/api"
+
+# Paths supported by the server application
+paths:
+  /test:
+    get:
+      operationId: "test.read"
+      tags:
+        - "Test"
+      summary: "Test data structure"
+      description: "Read the test list"
+      responses:
+        200:
+          description: "Successful read test list operation"
+          schema:
+            type: "array"
+            items:
+              properties:
+                test:
+                  type: "string"

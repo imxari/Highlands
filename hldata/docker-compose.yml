@@ -1,26 +1,56 @@
 version: '3' # Don't touch this
 
 services: # Don't touch this
-    highlands_web:
+    highlands_web: # Don't touch this
         restart: unless-stopped
+        hostname: flask # Don't touch this
         build: # Don't touch this
             dockerfile: Dockerfile # Don't touch this
-            context: ./Dockerfiles/ # Don't touch this
-        container_name: $WEB_NAME # Specify the container name
+            context: ./Dockerfiles/highlands_web/ # Don't touch this
+        container_name: $WEB_NAME # Edit in the .env file
         tty: true # Don't touch this
-        networks:
-            - highlands
+        networks: # Don't touch this
+            - highlands # Don't touch this
         volumes:
-            - ./app:/app # Don't touch this
-            - hl1:/var/lib/zerotier-one
+            - ./highlands_web:/app # Don't touch this
         ports:
-            - $WEB_PORT:5000 # Port '5000' is the Flask Applications webserver port
-        cap_add:
-            - NET_ADMIN
+            - 0.0.0.0:$WEB_PORT:5000 # Port '5000' is the Flask Applications webserver port. Edit in the .env file
 
-volumes:
-    hl1:
+    highlands_restapi: # Don't touch this
+        restart: unless-stopped
+        hostname: restapi # Don't touch this
+        build: # Don't touch this
+            dockerfile: Dockerfile # Don't touch this
+            context: ./Dockerfiles/highlands_restapi/ # Don't touch this
+        container_name: $API_NAME # Edit in the .env file
+        tty: true # Don't touch this
+        networks: # Don't touch this
+            - highlands # Don't touch this
+        volumes:
+            - ./highlands_restapi:/app # Don't touch this
+            - hl1:/var/lib/zerotier-one # Don't touch this
+        ports:
+            - 127.0.0.1:$API_PORT:5000 # Port '5000' is the Connexion Applications webserver port. Edit in the .env file
+        cap_add: # Don't touch this
+            - NET_ADMIN # Don't touch this
 
-networks:
-    highlands:
-        external: true
+    # Possible future implementation
+    # highlands_rethink: # Don't touch this
+    #     container_name: $RETHINK_NAME
+    #     restart: unless-stopped
+    #     image: rethinkdb # Don't touch this
+    #     hostname: rethink # Don't touch this
+    #     ports: # Don't touch this
+    #         - 127.0.0.1:$RETHINK_PORT:28015 # Port '28015' is the Rethink Databases default listening port. Edit in the .env file
+    #     volumes: # Don't touch this
+    #         - rt1:/data # Don't touch this
+    #     networks: # Don't touch this
+    #         - highlands # Don't touch this
+
+volumes: # Don't touch this
+    hl1: # Don't touch this
+ #   rt1: # Don't touch this
+
+networks: # Don't touch this
+    highlands: # Don't touch this
+        external: true # Don't touch this

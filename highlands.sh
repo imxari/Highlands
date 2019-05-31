@@ -24,7 +24,7 @@ cd $script_dir/hldata
 
 # Handle cli input
 case $1 in
-	"status")
+	"ps")
 		# Get the status of highlands
 		docker-compose ps
 		if [ $? -eq 0 ]; then
@@ -88,6 +88,6 @@ case $1 in
 			exit 1
 		fi;;
 	*)
-		echo "[!] Usage: ./highlands.sh <start|stop|restart|status|install>";;
+		echo "[!] Usage: ./highlands.sh <start|stop|restart|ps|install>";;
 esac
 

@@ -1,0 +1,26 @@
+<html>
+	<body>
+        
+        {# Import the navbar and required JavaScript, Styling and headers #}
+		{% include "base_loggedin.html" %}
+
+        <br><br><br>
+        
+        {# Container/Jumbotron for the contents of the page#}
+        <div class="container">
+            <div class="jumbotron">
+                {# Page title #}
+                <center>
+                    <h1> Networks </h1>
+                    <hr>
+                </center>
+                {# Pages Functions #}
+                <div class="btn-group mr-2" role="group" aria-label="group" style="width: auto; margin-bottom: 10px;">
+                    <button class="btn btn-primary"> Create Network </button>
+                    <button class="btn btn-success"> Refresh </button>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>
