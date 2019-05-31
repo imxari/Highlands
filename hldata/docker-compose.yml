@@ -34,22 +34,8 @@ services: # Don't touch this
         cap_add: # Don't touch this
             - NET_ADMIN # Don't touch this
 
-    # Possible future implementation
-    # highlands_rethink: # Don't touch this
-    #     container_name: $RETHINK_NAME
-    #     restart: unless-stopped
-    #     image: rethinkdb # Don't touch this
-    #     hostname: rethink # Don't touch this
-    #     ports: # Don't touch this
-    #         - 127.0.0.1:$RETHINK_PORT:28015 # Port '28015' is the Rethink Databases default listening port. Edit in the .env file
-    #     volumes: # Don't touch this
-    #         - rt1:/data # Don't touch this
-    #     networks: # Don't touch this
-    #         - highlands # Don't touch this
-
 volumes: # Don't touch this
     hl1: # Don't touch this
- #   rt1: # Don't touch this
 
 networks: # Don't touch this
     highlands: # Don't touch this

@@ -15,7 +15,7 @@ RUN apk update && apk upgrade && apk add \
 	bash python3 py-pip zerotier-one
 
 # Setup Flask and other required pip packages
-RUN pip install Flask Jinja2 requests enum python-dateutil bson pymongo ConfigParser connexion
+RUN pip install Flask Jinja2 requests enum python-dateutil bson pymongo ConfigParser connexion ipaddress
  
 # Remove APK cache
 RUN rm -rf /var/cache/apk/*

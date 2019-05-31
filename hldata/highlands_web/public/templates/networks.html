@@ -17,8 +17,29 @@
                 {# Pages Functions #}
                 <div class="btn-group mr-2" role="group" aria-label="group" style="width: auto; margin-bottom: 10px;">
                     <button class="btn btn-primary"> Create Network </button>
-                    <button class="btn btn-success"> Refresh </button>
                 </div>
+                <table class="table">
+                    <thead class="thead thead-dark">
+                        <th scope="col"> Network Name </th>
+                        <th scope="col"> Network ID </th>
+                        <th scope="col"> Action </th>
+                    </thead>
+                    <tbody>
+                        {% if networks|length <= 0 %}
+                            <tr>
+                                <td> No networks found... </td>
+                            </tr>
+                        {% else %}
+                            {% for network in networks %}
+                                <tr>
+                                    <td> {{ network['name'] }} </td>
+                                    <td> {{ network['nwid'] }} </td>
+                                    <td> <a href="#" class="btn btn-outline-light text-dark" style="padding-right: 8px;"> Detail </a> <a href="#" class="btn btn-outline-light text-dark" style="padding-right: 8px;"> Setup </a> <a href="#" class="btn btn-outline-light text-dark"> Members </a>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
 

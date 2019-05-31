@@ -6,8 +6,11 @@ import json
 import logging
 import os
 from datetime import datetime
+from libs import zerotier_nc as ztclient
+
+ztclient.main()
 
 # Create a handler for /api/test
-def read():
-    data = {"test": "Hello, World"}
+def get_status():
+    data = ztclient.request("/status")
     return data

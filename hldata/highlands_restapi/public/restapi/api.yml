@@ -1,0 +1,96 @@
+swagger: "2.0"
+info:
+  description: © 2019 Copyright H0lysp4nk All Rights Reserved.
+  version: "0.5.6"
+  title: Highlands REST API
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+basePath: "/api"
+
+# Paths supported by the server application
+paths:
+  /status:
+    get:
+      operationId: "status.get_status"
+      tags:
+        - "status"
+        - "zerotier"
+      summary: "Zerotier Status"
+      description: "Obtain the JSON array of the Zerotier Controllers status"
+      responses:
+        200:
+          description: "Successful return of Zerotier Controllers status"
+          schema:
+            type: "array"
+            items:
+              properties:
+                address:
+                  type: "string"
+                clock:
+                  type: "integer"
+                cluster:
+                  type: "object"
+                config:
+                  type: "object"
+                online:
+                  type: "boolean"
+                planetWorldId:
+                  type: "integer"
+                planetWorldTimestamp:
+                  type: "integer"
+                tcpFallbackActive:
+                  type: "boolean"
+                version:
+                  type: "string"
+                versionBuild:
+                  type: "integer"
+                versionMajor:
+                  type: "integer"
+                versionMinor:
+                  type: "integer"
+                versionRev:
+                  type: "integer"
+  /networks:
+    get:
+      operationId: "networks.get_networks"
+      tags:
+        - "network"
+        - "zerotier"
+      summary: "Zerotier Networks"
+      description: "Obtain the JSON array of the Zerotier Networks"
+      responses:
+        200:
+          description: "Successful return of Zerotier Networks"
+          schema:
+            type: "array"
+            items:
+              properties:
+                nwid:
+                  type: "string"
+  /network/{nwid}:
+    get:
+      operationId: "networks.get_network_info"
+      tags:
+        - "network"
+        - "zerotier"
+      summary: "Zerotier Networks"
+      description: "Obtain the JSON array of the Zerotier Networks"
+      parameters:
+        - name: "nwid"
+          in: "path"
+          description: "Network ID"
+          type: "string"
+          required: True
+      responses:
+        200:
+          description: "Successful return of Zerotier Networks"
+          schema:
+            type: "array"
+            items:
+              properties:
+                nwid:
+                  type: "string"
+                
