@@ -1,5 +1,8 @@
 # Highlands
 
+# DISCLAIMER project has moved!
+Please see: https://lab.lkeenan.co.uk/lkeenan/Highlands
+
 ## Warning
 Highlands is currently in BETA stages of development and may not be fully functional. When using this project at this current point in time expect issues.
 
