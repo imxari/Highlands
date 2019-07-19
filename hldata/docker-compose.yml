@@ -3,39 +3,55 @@ version: '3' # Don't touch this
 services: # Don't touch this
     highlands_web: # Don't touch this
         restart: unless-stopped
-        hostname: flask # Don't touch this
         build: # Don't touch this
             dockerfile: Dockerfile # Don't touch this
-            context: ./Dockerfiles/highlands_web/ # Don't touch this
+            context: ./dockerfiles/highlands_web/ # Don't touch this
         container_name: $WEB_NAME # Edit in the .env file
         tty: true # Don't touch this
         networks: # Don't touch this
             - highlands # Don't touch this
         volumes:
-            - ./highlands_web:/app # Don't touch this
+            - ${PWD}/volumes/highlands_web:/app # Don't touch this
         ports:
             - 0.0.0.0:$WEB_PORT:5000 # Port '5000' is the Flask Applications webserver port. Edit in the .env file
 
     highlands_restapi: # Don't touch this
         restart: unless-stopped
-        hostname: restapi # Don't touch this
         build: # Don't touch this
             dockerfile: Dockerfile # Don't touch this
-            context: ./Dockerfiles/highlands_restapi/ # Don't touch this
+            context: ./dockerfiles/highlands_restapi/ # Don't touch this
         container_name: $API_NAME # Edit in the .env file
         tty: true # Don't touch this
         networks: # Don't touch this
             - highlands # Don't touch this
         volumes:
-            - ./highlands_restapi:/app # Don't touch this
+            - ${PWD}/volumes/highlands_restapi:/app # Don't touch this
+            - ${PWD}/volumes/configs:/app/configs # Don't touch this
             - hl1:/var/lib/zerotier-one # Don't touch this
         ports:
-            - 127.0.0.1:$API_PORT:5000 # Port '5000' is the Connexion Applications webserver port. Edit in the .env file
+            - 127.0.0.1:$API_PORT:80 # Port '80' is the Connexion Applications webserver port. Edit in the .env file
         cap_add: # Don't touch this
             - NET_ADMIN # Don't touch this
 
+    highlands_mysql: # Don't touch this
+        image: mysql:5.7 # Don't touch this
+        container_name: $MYSQL_NAME # Don't touch this
+        restart: unless-stopped # Don't touch this
+        environment: # Don't touch this
+            MYSQL_DATABASE: highlands # Don't touch this
+            MYSQL_USER: $MYSQL_USER_USERNAME # Don't touch this
+            MYSQL_PASSWORD: $MYSQL_USER_PASSWORD # Don't touch this
+            MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD # Don't touch this
+        volumes: # Don't touch this
+            - mdb1:/var/lib/mysql # Don't touch this
+        ports:
+            - 127.0.0.1:$MYSQL_PORT:3306  # Don't touch this
+        networks:
+            - highlands  # Don't touch this
+
 volumes: # Don't touch this
     hl1: # Don't touch this
+    mdb1: # Don't touch this
 
 networks: # Don't touch this
     highlands: # Don't touch this

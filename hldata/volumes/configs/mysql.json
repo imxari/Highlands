@@ -1,0 +1,7 @@
+{
+    "host": "highlands_mysql",
+    "port": 3306,
+    "username": "highlandsuser",
+    "password": "password123",
+    "database": "highlands"
+}

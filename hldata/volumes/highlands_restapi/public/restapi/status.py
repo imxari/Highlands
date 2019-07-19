@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 # coding: utf8
 
-import ConfigParser
 import json
 import logging
 import os

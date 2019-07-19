@@ -12,10 +12,11 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
 
 # Add basics first
 RUN apk update && apk upgrade && apk add \
-	bash python3 py-pip zerotier-one
+	bash python3 py-pip zerotier-one mariadb-dev
 
 # Setup Flask and other required pip packages
-RUN pip install Flask Jinja2 requests enum python-dateutil bson pymongo ConfigParser connexion ipaddress
+RUN pip install --upgrade pip
+RUN pip install --upgrade Flask Jinja2 requests python-dateutil bson pymongo ipaddress connexion flask-sqlalchemy mysql-connector-python
  
 # Remove APK cache
 RUN rm -rf /var/cache/apk/*
@@ -31,6 +32,6 @@ COPY ./start.sh /bootstrap/start.sh
 RUN chmod -R 755 /bootstrap && chmod -R 755 /app
 
 # Run the application
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT ["/bootstrap/start.sh"]
 

@@ -3,7 +3,7 @@
 
 """ Imports """
 from flask import Flask, render_template, jsonify
-import os, json, random, string, re, sys, urllib, ConfigParser
+import os, json, random, string, re, sys, urllib
 from bson.json_util import loads, dumps
 import connexion
 

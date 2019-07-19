@@ -27,6 +27,8 @@ case $1 in
 	"ps")
 		# Get the status of highlands
 		docker-compose ps
+
+		# Check to see if that command executed successfully
 		if [ $? -eq 0 ]; then
 			# Success
 			echo "[!] Successfully received the status of highlands!"
@@ -39,6 +41,8 @@ case $1 in
 	"restart")
 		# Restart Highlands
 		docker-compose stop && docker-compose up -d
+
+		# Check to see if that command executed successfully
 		if [ $? -eq 0 ]; then
 			# Success
 			echo "[!] Highlands restarted successfully!"
@@ -51,6 +55,8 @@ case $1 in
 	"stop")
 		# Stop Highlands
 		docker-compose stop
+
+		# Check to see if that command executed successfully
 		if [ $? -eq 0 ]; then
 			# Success
 			echo "[!] Highlands stopped successfully!"
@@ -74,14 +80,37 @@ case $1 in
 			echo "[!] Highlands failed to start!"
 			exit 1
 		fi;;
+	"uninstall")
+		# Uninstall Highlands
+		docker-compose down
+
+		# Check to see if that command executed successfully
+		if [ $? -eq 0 ]; then
+			echo "[!] Highlands containers were successfully destroyed!"
+			echo "[!] To finish the removal of Highlands type: 'docker system prune' ALTHOUGH be careful as this will remove any dangling containers/images! Ensure that before running this command that all you're docker containres are online!"
+		else
+			echo "[!] Highlands containers couldn't be destroyed!"
+			exit 1
+		fi;;
 	"install")
 		# Install Highlands
-                docker network create highlands
-		docker-compose up -d --build
+        docker network create highlands
+
+		# Check to see if that command executed successfully
 		if [ $? -eq 0 ]; then
 			# Success
-			echo "[!] Highlands was successfully installed and started!"
-			exit 0
+			echo "[!] Highlands docker network created!"
+		else
+			# Failure
+			echo "[!] Highlands docker network couldn't be created! Does it already exist?"
+		fi
+
+		docker-compose up -d --build
+
+		# Check to see if that command executed successfully
+		if [ $? -eq 0 ]; then
+			# Success
+			echo "[!] Highlands was successfully started!"
 		else
 			# Failure
 			echo "[!] Highlands couldn't be installed!"

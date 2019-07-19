@@ -2,7 +2,7 @@
 FROM alpine:edge
 
 # Specify maintainer
-MAINTAINER Holy, https://github.com/h0lysp4nk
+LABEL maintainer="no-reply@lkeenan.co.uk"
 
 # Specify user
 USER root
@@ -15,7 +15,8 @@ RUN apk update && apk upgrade && apk add \
 	bash python3 py-pip
 
 # Setup Flask and other required pip packages
-RUN pip install Flask Jinja2 requests enum python-dateutil bson flask-htpasswd pymongo ConfigParser ipaddress
+RUN pip install --upgrade pip
+RUN pip install --upgrade Flask Jinja2 requests python-dateutil bson flask-htpasswd pymongo ipaddress
  
 # Remove APK cache
 RUN rm -rf /var/cache/apk/*

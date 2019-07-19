@@ -93,4 +93,27 @@ paths:
               properties:
                 nwid:
                   type: "string"
+  /network/{nwid}/member:
+    get:
+      operationId: "networks.get_network_members"
+      tags:
+        - "network"
+        - "zerotier"
+      summary: "Zerotier Networks"
+      description: "Obtain the JSON array of a networks list of members"
+      parameters:
+        - name: "nwid"
+          in: "path"
+          description: "Network ID"
+          type: "string"
+          required: True
+      responses:
+        200:
+          description: "Successful return of Zerotier Networks"
+          schema:
+            type: "array"
+            items:
+              properties:
+                nwid:
+                  type: "string"
                 

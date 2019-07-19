@@ -3,7 +3,7 @@
 
 """ Imports """
 from flask import Flask, render_template, url_for, redirect, flash, request, session, abort
-import os, json, random, string, re, sys, urllib, ConfigParser, requests
+import os, json, random, string, re, sys, urllib, requests
 from bson.json_util import loads, dumps
 from flask_htpasswd import HtPasswdAuth
 from markupsafe import Markup
@@ -74,10 +74,10 @@ def dashboard():
 
 """ End Dashboard """
 
-# =============================================================================
-
 """ Start """
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
+
 """ End Start """
 
