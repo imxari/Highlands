@@ -13,4 +13,4 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 
 script:
-  - cd ./hldata && docker-compose build
+  - cd ./hldata && docker-compose up --build
